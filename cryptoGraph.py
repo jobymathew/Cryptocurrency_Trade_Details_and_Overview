@@ -1,6 +1,18 @@
 import sys
 import argparse
 import numpy as np
+import requests
+
+# Getting the data from the API
+trades = requests.get('https://www.binance.com/api/v3/ticker/24hr')
+exchange = requests.get('https://www.binance.com/api/v3/exchangeInfo')
+tokenTrades = requests.get('https://www.binance.com/api/v3/trades?symbol=ETHBTC')
+
+# Converting to json
+trade_data = trades.json()
+exchange_data = exchange.json()
+tokenTrades_data = tokenTrades.json()
+
 
 # Setting up the argument parser
 ap = argparse.ArgumentParser()
@@ -45,6 +57,18 @@ if args['interactive']:
 # Entering the report mode
 elif args['report']:
 	print('Entering report mode')
+	print('\nTrade Data\n')
+	for data in trade_data[:3]:
+		print(data)
+		print()
+	print('\nExchange information\n')
+	for i in range(3):
+		print(exchange_data['symbols'][i])
+		print()
+	print('\nToken trades\n')
+	for data in tokenTrades_data[:3]:
+		print(data)
+		print()
 
 # Showing the usage information
 else:
