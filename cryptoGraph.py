@@ -12,6 +12,7 @@ ap.add_argument("-r", "--report", help='report mode', action='store_true')
 # Getting the argument variables
 args = vars(ap.parse_args())
 
+# Function which acts as a switch case. Note that I have used dictionary here, it is only used here as an option picker
 def switchFunction(choice): 
 	getValues = {
 			1: '1',
