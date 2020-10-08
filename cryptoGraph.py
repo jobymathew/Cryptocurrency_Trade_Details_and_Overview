@@ -2,16 +2,22 @@ import sys
 import argparse
 import numpy as np
 import requests
+# Minh Dao - Tutor Sophie Lee-Goh
+# Using the Graph class which I made during the practicals
+from DSAGraph import DSAGraph
 
 # Getting the data from the API
-trades = requests.get('https://www.binance.com/api/v3/ticker/24hr')
-exchange = requests.get('https://www.binance.com/api/v3/exchangeInfo')
-tokenTrades = requests.get('https://www.binance.com/api/v3/trades?symbol=ETHBTC')
+tradeInfo = requests.get('https://www.binance.com/api/v3/ticker/24hr')
+exchangeInfo = requests.get('https://www.binance.com/api/v3/exchangeInfo')
+# tokenTrades = requests.get('https://www.binance.com/api/v3/trades?symbol=ETHBTC')
+
+# declaring the graph object
+graph = DSAGraph()
 
 # Converting to json
-trade_data = trades.json()
-exchange_data = exchange.json()
-tokenTrades_data = tokenTrades.json()
+trade_data = tradeInfo.json()
+exchange_data = exchangeInfo.json()
+# tokenTrades_data = tokenTrades.json()
 
 
 # Setting up the argument parser
@@ -57,18 +63,21 @@ if args['interactive']:
 # Entering the report mode
 elif args['report']:
 	print('Entering report mode')
-	print('\nTrade Data\n')
-	for data in trade_data[:3]:
-		print(data)
-		print()
-	print('\nExchange information\n')
-	for i in range(3):
-		print(exchange_data['symbols'][i])
-		print()
-	print('\nToken trades\n')
-	for data in tokenTrades_data[:3]:
-		print(data)
-		print()
+	print('\nAdding the assets into the graph\n')
+	for i in range(10):
+		baseAsset = exchange_data['symbols'][i]['baseAsset']
+		quoteAsset = exchange_data['symbols'][i]['quoteAsset']
+		if not graph.hasVertex(baseAsset):
+			graph.addVertex(baseAsset, i)
+		if not graph.hasVertex(quoteAsset):
+			graph.addVertex(quoteAsset, i)
+		graph.addEdge(baseAsset, quoteAsset)
+	graph.display()
+	# for data in trade_data[:10]:
+	# 	print(data['symbol'])
+	# 	print()
+	print('\nMaking a connection\n')
+
 
 # Showing the usage information
 else:
