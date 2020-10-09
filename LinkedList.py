@@ -77,14 +77,14 @@ class DSALinkedList():
 			newNd.setPrev(self.tail)
 			self.tail = newNd
 	
-	#displaying the first node of the list
+	#return the first node of the list
 	def peekFirst(self):
 		if self.isEmpty():
 			print("The List is empty")
 		else:
 			return self.head.getValue()
 	
-	#displaying the last node of the list
+	#return the last node of the list
 	def peekLast(self):
 		if self.isEmpty():
 			print("The List is empty")
@@ -135,8 +135,9 @@ class DSALinkedList():
 	def display(self):
 		currNd = self.head
 		while(currNd != None):
-			print(currNd.getValue())
+			print(currNd.getValue(), end=' ')
 			currNd = currNd.getNext()
+		print()
 	
 	# returning a list of the items in linked list
 	def listOfValues(self):

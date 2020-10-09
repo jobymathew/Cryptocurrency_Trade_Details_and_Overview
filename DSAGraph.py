@@ -7,25 +7,22 @@
 
 from LinkedList import DSALinkedList
 from StackQueue import DSAStack, DSAQueue
+# importing sys to increase the recursion limit
+import sys
+sys.setrecursionlimit(10**6) 
+import copy
 
-# CLASS DSAGraphEdge
-# FIELDS: from, to, label, value # can have label and/or value
-# CONSTRUCTOR DSAGraphEdge IMPORTS fromVertex, toVertex, inLabel, inValue
-# ACCESSOR getLabel IMPORTS NONE EXPORTS label
-# ACCESSOR getValue IMPORTS NONE EXPORTS value
-# ACCESSOR getFrom IMPORTS NONE EXPORTS vertex
-# ACCESSOR getTo IMPORTS NONE EXPORTS vertex
-# ACCESSOR isDirected IMPORTS NONE EXPORTS boolean
-# ACCESSOR toString IMPORTS NONE EXPORTS string
 
 class DSAGraphEdge():
 	
 	# initializing the constructor
-	def __init__(self, fromVertex, toVertex, volume, count):
+	def __init__(self, fromVertex, toVertex, status, volume=0, count=0, weightedAvgPrice=0):
 		self.fromVertex = fromVertex
 		self.toVertex = toVertex
+		self.status = status
 		self.volume = volume
 		self.count = count
+		self.weightedAvgPrice = weightedAvgPrice
 	
 	# Function to return the value of from vertex
 	def getFromVertex(self):
@@ -34,6 +31,22 @@ class DSAGraphEdge():
 	# Function to return the value of to vertex
 	def getToVertex(self):
 		return self.toVertex
+	
+	# Function to return the status of the trade
+	def getStatus(self):
+		return self.status
+	
+	# Function to set the volume of the trade
+	def setVolume(self, inVolume):
+		self.volume = inVolume
+	
+	# Function to set the count of the trade
+	def setCount(self, inCount):
+		self.count = inCount
+	
+	# Function to set the weightedAvgPrice of the trade
+	def setWeightedAvgPrice(self, inWeightedAvgPrice):
+		self.weightedAvgPrice = inWeightedAvgPrice
 
 	# Function to return the volume of the trade
 	def getVolume(self):
@@ -42,6 +55,10 @@ class DSAGraphEdge():
 	# Function to return the count of the trade
 	def getCount(self):
 		return self.count
+	
+	# Function to return the weightedAvgPrice of the trade
+	def getWeightedAvgPrice(self):
+		return self.weightedAvgPrice
 
 class DSAGraphNode():
 
@@ -51,7 +68,71 @@ class DSAGraphNode():
 		self.value = inValue
 		self.edges = DSALinkedList()
 		self.visited = False
+		self.priceChange = DSALinkedList()
+		self.totalPriceChange = 0
+		self.priceChangePercent = DSALinkedList()
+		self.totalPriceChangePercent = 0
+		self.volume = DSALinkedList()
+		self.totalVolume = 0
+		self.count = DSALinkedList()
+		self.totalCount = 0
 	
+	# Adding the price change to the list
+	def addPriceChange(self, inPriceChange):
+		self.priceChange.insertLast(inPriceChange)
+		self.totalPriceChange += float(inPriceChange)
+	
+	# Getting the total price change 
+	def getTotalPriceChange(self):
+		return self.totalPriceChange
+	
+	# Getting the average price change
+	def getAveragePriceChange(self):
+		countOfItems = self.priceChange.count()
+		return self.totalPriceChange/countOfItems
+
+	# Adding the price change percent to the list
+	def addPriceChangePercent(self, inPriceChangePercent):
+		self.priceChangePercent.insertLast(inPriceChangePercent)
+		self.totalPriceChangePercent += float(inPriceChangePercent)
+	
+	# Getting the total price change 
+	def getTotalPriceChangePercent(self):
+		return self.totalPriceChangePercent
+	
+	# Getting the average price change precent
+	def getAveragePriceChangePercent(self):
+		countOfItems = self.priceChangePercent.count()
+		return self.totalPriceChangePercent/countOfItems
+	
+	# Adding the volume to the list
+	def addVolume(self, inVolume):
+		self.volume.insertLast(inVolume)
+		self.totalVolume += float(inVolume)
+
+	# Getting the total volume
+	def getTotalVolume(self):
+		return self.totalVolume
+	
+	# Getting the average volume
+	def getAverageVolume(self):
+		countOfItems = self.volume.count()
+		return self.totalVolume/countOfItems
+
+	# Adding the count to the list
+	def addCount(self, inCount):
+		self.count.insertLast(inCount)
+		self.totalCount += int(inCount)
+	
+	# Getting the total count
+	def getTotalCount(self):
+		return self.totalCount
+	
+	# Getting the average count
+	def getAverageCount(self):
+		countOfItems = self.count.count()
+		return int(self.totalCount/countOfItems)
+
 	# Returning the label of the graph node
 	def getLabel(self):
 		return self.label
@@ -120,13 +201,13 @@ class DSAGraph():
 		self.vertices.insertLast(vertex)
 
 	# Adding an edge into the graph
-	def addEdge(self, label1, label2, volume, count):
+	def addEdge(self, label1, label2, status):
 		vertex1 = self.findVertex(label1)
 		vertex2 = self.findVertex(label2)
 		vertex1.addEdge(label2)
 		# vertex2.addEdge(label1)
 		# edge = (label1, label2)
-		edge = DSAGraphEdge(vertex1, vertex2, volume, count)
+		edge = DSAGraphEdge(vertex1, vertex2, status)
 		self.edges.insertLast(edge)
 
 	# Searching for a vertex in the graph
@@ -167,22 +248,102 @@ class DSAGraph():
 		edge = self.findEdge(vertex1, vertex2)
 		return edge
 	
+	# Function to check if there is a trade edge in the graph
+	def hasTradeEdge(self, tradeName):
+		isFound = False
+		if self.getTradeEdge(tradeName):
+			isFound = True
+		return isFound
+	
+	# Function to find the edge connecting the two assets
+	def getTradeEdge(self, tradeName):
+		edge = None
+		vertices = self.listOfVertices()
+		for label1 in vertices:
+			for label2 in vertices:
+				if (label1+label2) == tradeName:
+					edge = self.getEdge(label1, label2)
+		return edge
+	
+	# Function to check if the trade edge is tradeable
+	def isTrading(self, tradeName):
+		trading = False
+		edge = self.getTradeEdge(tradeName)
+		if edge and edge.getStatus() == 'TRADING':
+			trading = True
+		return trading
+	
+	# Function to find the trade path between the given assets - Note that this is a modified DFS 
+	def _getPaths(self, labels, tradeList, quoteAsset):
+		# Getting the last value from the labels list
+		label = labels.peekLast()
+		vertex = self.getVertex(label)
+		# Marking the vertex as visited
+		vertex.setVisited()
+		adjData = self.getAdjacent(label)  
+		# Checking if the adjacent list is not none and the trade path is not break            
+		if adjData != None and self.isTrading(label+quoteAsset):
+			if quoteAsset in adjData:
+				# adding the quote asset to the path and appending to the trade list
+				foundPath = copy.deepcopy(labels)
+				foundPath.insertLast(quoteAsset)
+				tradeList.insertLast(foundPath)
+				# remove the quote asset from the list
+				adjData.remove(quoteAsset)
+			for val in adjData:
+				newVertex = self.getVertex(val)
+				# If the selected vertex is not visited, it is then added to the labels list and recursed for a new trade path
+				if not newVertex.getVisited():
+					newLabels = copy.deepcopy(labels)
+					newLabels.insertLast(val)
+					tradeList = self._getPaths(newLabels, tradeList, quoteAsset)
+		return tradeList
+	
+	# Function to get the indirect trade path between two assets
+	def getTradePaths(self, baseAsset, quoteAsset):
+		# Initializing the list
+		tradeList = DSALinkedList()
+		labelList = DSALinkedList()
+		labelList.insertLast(baseAsset)
+		# Calling the recursive function
+		resList = self._getPaths(labelList, tradeList, quoteAsset)
+		# returning the list
+		return resList
+
 	# Retruning the list of adjacent vertices of the vertex - returns the label
 	def getAdjacent(self, label):
+		adjacentVertex = []
 		vertex = self.findVertex(label)
-		return vertex.getAdjacent()
+		if vertex:
+			adjacentVertex = vertex.getAdjacent()
+		return adjacentVertex
 	
+	# Retruning the list of adjacent vertices of the vertex - returns the label
+	def displayAdjacent(self, label):
+		adjacentVertex = self.getAdjacent(label)
+		print(adjacentVertex)
+		
+
 	# Retruning the list of adjacent vertices of the vertex - return the edge class
 	def getAdjacentE(self, label1):
 		adjacentEdges = []
 		vertex1 = self.findVertex(label1)
-		adjacentVertices =  vertex1.getAdjacent()
-		for label2 in adjacentVertices:
-			if self.hasEdge(label1, label2):
-				# print(vertex2.getLabel())
-				val = self.getEdge(label1, label2)
-				adjacentEdges.append(val)
+		if vertex1:
+			adjacentVertices =  vertex1.getAdjacent()
+			if adjacentVertices:
+				for label2 in adjacentVertices:
+					if self.hasEdge(label1, label2):
+						# print(vertex2.getLabel())
+						val = self.getEdge(label1, label2)
+						adjacentEdges.append(val)
 		return adjacentEdges
+	
+	def displayAdjacentE(self, label):
+		edges = self.getAdjacentE(label)
+		displayList = []
+		for edge in edges:
+			displayList.append(f'{edge.getFromVertex().getLabel()}{edge.getToVertex().getLabel()}')
+		print(displayList)
 	
 	# Checking if a vertex is adjacent to the other
 	def isAdjacent(self, label1, label2):
@@ -218,7 +379,7 @@ class DSAGraph():
 		edgeList = self.edges.listOfValues()
 		ll = []
 		for edge in edgeList:
-			output = f'{edge.getFromVertex().getLabel()}-{edge.getToVertex().getLabel()}'
+			output = f'{edge.getFromVertex().getLabel()}{edge.getToVertex().getLabel()}'
 			ll.append(output)
 		return ll
 	
@@ -235,6 +396,40 @@ class DSAGraph():
 				if not vertex.getVisited():
 					ll.append(vertex)
 		return ll
+	
+	# Implementing Depth First Search
+	def depthFirstSearch(self, vertex):
+		# Transactions
+		T = []
+		# The order of DFS
+		old = []
+		# Initializing the stack
+		stack = DSAStack()
+		# Setting the first vertex as visited
+		vertex.setVisited()
+		# Pushing the vertex into the DFS List
+		stack.push(vertex.getLabel())
+		old.append(vertex.getLabel())
+		while not stack.isEmpty():
+			# Getting all the adjacent vertices that are not visited in the graph
+			while self.getNotVisitedVertices(vertex.getAdjacent()) != []:
+				notVisitedVertices = self.getNotVisitedVertices(vertex.getAdjacent())
+				notVisitedValue = notVisitedVertices[0].getLabel()
+				# Adding the transaction into the list of transactions
+				T.append((vertex.getLabel(), notVisitedValue))
+				if notVisitedValue == quoteAsset:
+					tradeList.append(old)
+					old = [vertex.getLabel()]
+				# Setting the vertex as visited
+				notVisitedVertices[0].setVisited()
+				# Pushing the vertex into the stack
+				stack.push(notVisitedValue)
+				# Adding the vertex into the DFS List
+				old.append(notVisitedValue)
+				vertex = notVisitedVertices[0]
+			# Popping the next item from the stack
+			vertex = self.find(stack.pop())
+		return old
 	
 	# Implementing breadth First Search
 	def breadthFirstSearch(self):
@@ -254,11 +449,14 @@ class DSAGraph():
 		while not queue.isEmpty():
 			# Getting the vertex form the queue
 			vertex = self.findVertex(queue.dequeue())
-			if self.getAdjacent(vertex.getLabel()) != None:
+			print(f'Adjacent of {vertex.getLabel()} is {self.getAdjacent(vertex.getLabel())}')
+			if self.getNotVisitedVertices(self.getAdjacent(vertex.getLabel())) != []:
 				adjacentList = self.getNotVisitedVertices(self.getAdjacent(vertex.getLabel()))
+				print(f'Not Visited Adjacent List of {vertex.getLabel()} is')
 				for adjVertex in adjacentList:
 					# Adding the transaction into the list
 					T.append((vertex.getLabel(), adjVertex.getLabel()))
+					print(adjVertex.getLabel())
 					# Setting the vertex as visited
 					adjVertex.setVisited()
 					# Adding it to the BFS List
