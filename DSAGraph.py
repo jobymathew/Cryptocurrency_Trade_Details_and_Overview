@@ -16,13 +16,19 @@ import copy
 class DSAGraphEdge():
 	
 	# initializing the constructor
-	def __init__(self, fromVertex, toVertex, status, volume=0, count=0, weightedAvgPrice=0):
+	def __init__(self, fromVertex, toVertex, status):
 		self.fromVertex = fromVertex
 		self.toVertex = toVertex
 		self.status = status
-		self.volume = volume
-		self.count = count
-		self.weightedAvgPrice = weightedAvgPrice
+		self.volume = 0
+		self.quoteVolume = 0
+		self.count = 0
+		self.weightedAvgPrice = 0
+		self.openPrice = 0
+		self.highPrice = 0
+		self.lowPrice = 0
+		self.priceChange = 0
+		self.priceChangePercent = 0
 	
 	# Function to return the value of from vertex
 	def getFromVertex(self):
@@ -59,6 +65,55 @@ class DSAGraphEdge():
 	# Function to return the weightedAvgPrice of the trade
 	def getWeightedAvgPrice(self):
 		return self.weightedAvgPrice
+	
+	# Function to set the quote volume of the trade
+	def setQuoteVolume(self, inQuoteVolume):
+		self.quoteVolume = inQuoteVolume
+	
+	# Function to return the quote volume of the trade
+	def getQuoteVolume(self):
+		return self.quoteVolume
+	
+	# Function to set the open price of the trade
+	def setOpenPrice(self, inQuoteVolume):
+		self.quoteVolume = inQuoteVolume
+	
+	# Function to return the open price of the trade
+	def getOpenPrice(self):
+		return self.openPrice
+	
+	# Function to set the high price of the trade
+	def setHighPrice(self, inHighPrice):
+		self.highPrice = inHighPrice
+	
+	# Function to return the high price of the trade
+	def getHighPrice(self):
+		return self.highPrice
+	
+	# Function to set the low price of the trade
+	def setLowPrice(self, inLowPrice):
+		self.lowPrice = inLowPrice
+	
+	# Function to return the low price of the trade
+	def getLowPrice(self):
+		return self.lowPrice
+	
+	# Function to set the price change of the trade
+	def setPriceChange(self, inPriceChange):
+		self.priceChange = inPriceChange
+	
+	# Function to return the price change of the trade
+	def getPriceChange(self):
+		return self.priceChange
+	
+	# Function to set the price change percent of the trade
+	def setPriceChangePercent(self, inPriceChangePercent):
+		self.priceChangePercent = inPriceChangePercent
+	
+	# Function to return the low price of the trade
+	def getPriceChangePercent(self):
+		return self.priceChangePercent
+
 
 class DSAGraphNode():
 
