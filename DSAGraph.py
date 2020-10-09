@@ -1,7 +1,7 @@
-# FILE: DSAGraph.py
+# FILE: DSAGraph.py - Modified for the assignment
 # AUTHOR: Joby Mathew
 # UNIT: COMP5008 Data Structures and Algorithms
-# PURPOSE: Provides a class for Graph Implementation
+# PURPOSE: Provides a class for Graph Implementation which is to be used as cryptoGraph
 # REFERENCE: Lecture Slides
 # Last Mod: 18th September, 2020
 
@@ -10,25 +10,26 @@ from StackQueue import DSAStack, DSAQueue
 # importing sys to increase the recursion limit
 import sys
 sys.setrecursionlimit(10**6) 
+# importing copy to perform deep copy of classes
 import copy
 
 
 class DSAGraphEdge():
 	
 	# initializing the constructor
-	def __init__(self, fromVertex, toVertex, status):
+	def __init__(self, fromVertex, toVertex, status, volume=0, quoteVolume=0, count=0, weightedPrice=0, openPrice=0, highPrice=0, lowPrice=0, priceChange=0, priceChangePercent=0):
 		self.fromVertex = fromVertex
 		self.toVertex = toVertex
 		self.status = status
-		self.volume = 0
-		self.quoteVolume = 0
-		self.count = 0
-		self.weightedAvgPrice = 0
-		self.openPrice = 0
-		self.highPrice = 0
-		self.lowPrice = 0
-		self.priceChange = 0
-		self.priceChangePercent = 0
+		self.volume = volume
+		self.quoteVolume = quoteVolume
+		self.count = count
+		self.weightedAvgPrice = weightedAvgPrice
+		self.openPrice = openPrice
+		self.highPrice = highPrice
+		self.lowPrice = lowPrice
+		self.priceChange = priceChange
+		self.priceChangePercent = priceChangePercent
 	
 	# Function to return the value of from vertex
 	def getFromVertex(self):
@@ -118,19 +119,23 @@ class DSAGraphEdge():
 class DSAGraphNode():
 
 	# initializing the graph
-	def __init__(self, inLabel, inValue):
+	def __init__(self, inLabel, inValue, edges=DSALinkedList(), visited=False, priceChange=DSALinkedList(), totalPriceChange=0, priceChangePercent=DSALinkedList(), totalPriceChangePercent=0, volume=DSALinkedList(), totalVolume=0, count=DSALinkedList(), totalCount=0 ):
 		self.label = inLabel
 		self.value = inValue
-		self.edges = DSALinkedList()
-		self.visited = False
-		self.priceChange = DSALinkedList()
-		self.totalPriceChange = 0
-		self.priceChangePercent = DSALinkedList()
-		self.totalPriceChangePercent = 0
-		self.volume = DSALinkedList()
-		self.totalVolume = 0
-		self.count = DSALinkedList()
-		self.totalCount = 0
+		self.edges = edges
+		self.visited = visited
+		self.priceChange = priceChange
+		self.totalPriceChange = totalPriceChange
+		self.priceChangePercent = priceChangePercent
+		self.totalPriceChangePercent = totalPriceChangePercent
+		self.volume = volume
+		self.totalVolume = totalVolume
+		self.count = count
+		self.totalCount = totalCount
+	
+	# Returning the list of edges
+	def getEdges(self):
+		return self.edges
 	
 	# Adding the price change to the list
 	def addPriceChange(self, inPriceChange):
@@ -254,6 +259,11 @@ class DSAGraph():
 	def addVertex(self, label, value):
 		vertex = DSAGraphNode(label, value)
 		self.vertices.insertLast(vertex)
+	
+	# Adding a copy of the given vertex into the graph
+	def addVertexCopy(self, inVertex):
+		vertex = DSAGraphNode(inVertex.getLabel(), inVertex.getValue(), inVertex.getEdges(), inVertex.getVisited(), inVertex.getPriceChange(), inVertex.getTotalPriceChange(), inVertex.getPriceChangePercent(), inVertex.getTotalPriceChangePercent(), inVertex.getVolume(), inVertex.getTotalVolume(), inVertex.getTotalCount())
+		self.vertices.insertLast(vertex)
 
 	# Adding an edge into the graph
 	def addEdge(self, label1, label2, status):
@@ -319,6 +329,44 @@ class DSAGraph():
 				if (label1+label2) == tradeName:
 					edge = self.getEdge(label1, label2)
 		return edge
+	
+	# Returning the list of edges having the input asset
+	def getAllEdges(self, asset):
+		edgesWithAsset = DSALinkedList()
+		# Getting the list of vertices
+		vertices = self.listOfVertices()
+		for label in vertices:
+			if self.hasTradeEdge(label+asset):
+				edge = self.getEdge(label, asset)
+				edgesWithAsset.insertLast(edge)
+			if self.hasTradeEdge(asset+label):
+				edge = self.getEdge(asset, label)
+				edgeWithAsset.insertLast(edge)
+		return edgesWithAsset
+	
+	# Adding a trade edge copy into the graph with an edge as input
+	def addEdgeCopy(self, inEdge):
+		vertex1 = self.findVertex(inEdge.getFromVertex())
+		vertex2 = self.findVertex(inEdge.getToVertex())
+		vertex1.addEdge(inEdge.getToVertex())
+		# Getting all the values from the edge and creating a new edge
+		edge = DSAGraphEdge(inEdge.getFromVertex(), inEdge.getToVertex(), inEdge.getStatus(), inEdge.getVolume(), inEdge.getQuoteVolume(), inEdge.getCount(), inEdge.getWeightedPrice, inEdge.getOpenPrice, inEdge.getHighPrice(), inEdge.getLowPrice(), inEdge.getPriceChange(), inEdge.getPriceChangePercent())
+		self.edges.insertLast(edge)
+
+	# Adding the list of edges to the graph
+	def addAllEdges(self, inEdges):
+		edgeHead = inEdges.head
+		while(edgeHead != None):
+			self.addTradeEdge(edgeHead.getValue())
+			edgeHead = edgeHead.getNext()
+	
+	# Function to remove a vertex from a graph
+	def removeVertex(self, inVertex):
+		vertex = self.getVertex(inVertex)
+		self.vertices.delete(vertex)
+		# unfinished
+	
+	# removeAllEdges function
 	
 	# Function to check if the trade edge is tradeable
 	def isTrading(self, tradeName):
@@ -451,75 +499,6 @@ class DSAGraph():
 				if not vertex.getVisited():
 					ll.append(vertex)
 		return ll
-	
-	# Implementing Depth First Search
-	def depthFirstSearch(self, vertex):
-		# Transactions
-		T = []
-		# The order of DFS
-		old = []
-		# Initializing the stack
-		stack = DSAStack()
-		# Setting the first vertex as visited
-		vertex.setVisited()
-		# Pushing the vertex into the DFS List
-		stack.push(vertex.getLabel())
-		old.append(vertex.getLabel())
-		while not stack.isEmpty():
-			# Getting all the adjacent vertices that are not visited in the graph
-			while self.getNotVisitedVertices(vertex.getAdjacent()) != []:
-				notVisitedVertices = self.getNotVisitedVertices(vertex.getAdjacent())
-				notVisitedValue = notVisitedVertices[0].getLabel()
-				# Adding the transaction into the list of transactions
-				T.append((vertex.getLabel(), notVisitedValue))
-				if notVisitedValue == quoteAsset:
-					tradeList.append(old)
-					old = [vertex.getLabel()]
-				# Setting the vertex as visited
-				notVisitedVertices[0].setVisited()
-				# Pushing the vertex into the stack
-				stack.push(notVisitedValue)
-				# Adding the vertex into the DFS List
-				old.append(notVisitedValue)
-				vertex = notVisitedVertices[0]
-			# Popping the next item from the stack
-			vertex = self.find(stack.pop())
-		return old
-	
-	# Implementing breadth First Search
-	def breadthFirstSearch(self):
-		# Transactions
-		T = []
-		# The order of BFS
-		old = []
-		# Initializing the queue
-		queue = DSAQueue()
-		# Getting the fist vertex from the graph
-		vertex = self.getFirstVertex()
-		# Setting the first vertex as visited
-		vertex.setVisited()
-		# Pushing the vertex into the BFS List
-		old.append(vertex.getLabel())
-		queue.enqueue(vertex.getLabel())
-		while not queue.isEmpty():
-			# Getting the vertex form the queue
-			vertex = self.findVertex(queue.dequeue())
-			print(f'Adjacent of {vertex.getLabel()} is {self.getAdjacent(vertex.getLabel())}')
-			if self.getNotVisitedVertices(self.getAdjacent(vertex.getLabel())) != []:
-				adjacentList = self.getNotVisitedVertices(self.getAdjacent(vertex.getLabel()))
-				print(f'Not Visited Adjacent List of {vertex.getLabel()} is')
-				for adjVertex in adjacentList:
-					# Adding the transaction into the list
-					T.append((vertex.getLabel(), adjVertex.getLabel()))
-					print(adjVertex.getLabel())
-					# Setting the vertex as visited
-					adjVertex.setVisited()
-					# Adding it to the BFS List
-					old.append(adjVertex.getLabel())
-					# Adding it to the queue
-					queue.enqueue(adjVertex.getLabel())
-		return old
-
 
 if __name__ == '__main__':
 	print("------------Graphs-----------\n")

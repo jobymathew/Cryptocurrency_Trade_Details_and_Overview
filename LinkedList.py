@@ -115,6 +115,18 @@ class DSALinkedList():
 			self.tail.setNext(None)
 			return rmNd
 	
+	#remvoing the input value from the list
+	def remove(self, inValue):
+		if self.isEmpty():
+			print("The List is empty")
+		else:
+			rmNd = self.head
+			while(rmNd != None):
+				if rmNd.getValue() == inValue:
+					rmNd.getPrev().setNext(rmNd.getNext())
+				rmNd = rmNd.getNext()
+			return rmNd
+	
 	#iterate the elements of the list
 	def __iter__(self):
 		self.cur = self.head

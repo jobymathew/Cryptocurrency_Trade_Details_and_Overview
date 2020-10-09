@@ -1,10 +1,14 @@
+# sys and argparse to implement argument parsing
 import sys
 import argparse
 import numpy as np
+# requests to get the data from the API
 import requests
 import pickle
+# importing copy to perform deep copy of classes
+import copy
 # Minh Dao - Tutor Sophie Lee-Goh
-# Using the Graph class which I made during the practicals
+# Using the Graph and LinkedList class which I made during the practicals - Modified to suite the assignment
 from DSAGraph import DSAGraph
 from LinkedList import DSALinkedList
 import json
@@ -16,6 +20,7 @@ import json
 
 # declaring the graph object
 graph = DSAGraph()
+filterGraph = None
 
 # Converting to json
 tradeFile = open('trade_file.json')
@@ -78,6 +83,8 @@ def loadTradeData():
 		tradeEdge.setOpenPrice(openPrice)
 		tradeEdge.setCount(count)
 		tradeEdge.setWeightedAvgPrice(weightedAvgPrice)
+	# Making a copy of the graph 
+	filterGraph = copy.deepcopy(graph)
 	print('Trade data has been loaded')
 
 # Function to show the data loading options
@@ -103,8 +110,8 @@ def displayTradeDetails():
 	print("Input the trade name")
 	tradeName = input()
 	# Checking if trade edge exists
-	if graph.hasTradeEdge(tradeName):
-		graphEdge = graph.getTradeEdge(tradeName)
+	if filterGraph.hasTradeEdge(tradeName):
+		graphEdge = filterGraph.getTradeEdge(tradeName)
 		# Getting the two assets 
 		baseAsset = graphEdge.getFromVertex()
 		quoteAsset = graphEdge.getToVertex()
@@ -128,8 +135,8 @@ def displayTradeDetails():
 def displayAssetDetails():
 	print("Input the asset name")
 	assetName = input()
-	if graph.hasVertex(assetName):
-		vertex = graph.getVertex(assetName)
+	if filterGraph.hasVertex(assetName):
+		vertex = filterGraph.getVertex(assetName)
 		if (vertex.getTotalPriceChange() == 0):
 			print('No data as there is no trading')
 		else:
@@ -152,7 +159,7 @@ def displayTradePaths():
 	print("Enter the quote asset")
 	quoteAsset = input()
 	# Getting the trade list
-	tradeList = graph.getTradePaths(baseAsset, quoteAsset)
+	tradeList = filterGraph.getTradePaths(baseAsset, quoteAsset)
 	# Displaying the trade paths if present, else displaying no trade paths
 	if tradeList.isEmpty():
 		print('\nNo Trade Paths\n')
@@ -173,7 +180,7 @@ def readFromSerializedFile():
 		with open('serializedCrytoGraph.txt', 'rb') as dataFile:
 			#loading the file 
 			inGraph = pickle.load(dataFile)
-			graph = inGraph
+			filterGraph = inGraph
 			print("Graph has been read from the Serialized File")
 	except:
 		print("Error: object file does not exist")
@@ -183,7 +190,7 @@ def writeToSerializedFile():
 	try:
 		# Writing in the serialized file
 		with open('serializedCrytoGraph.txt', 'wb') as dataFile:
-			pickle.dump(graph, dataFile)
+			pickle.dump(filterGraph, dataFile)
 			print('Graph has been written into the serialized file')
 	except:
 		print("Error: problem pickling object!")
