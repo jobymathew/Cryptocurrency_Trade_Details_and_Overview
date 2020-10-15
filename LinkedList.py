@@ -157,13 +157,15 @@ class DSALinkedList():
 	
 	# returning a list of the items in linked list
 	def listOfValues(self):
-		ll = []
-		currNd = self.head
+		size = self.count()
+		rtnList = np.empty(size, dtype=object)
+		currNd, i = self.head, 0
 		if not (self.isEmpty()):
 			while(currNd != None):
-				ll.append(currNd.getValue())
+				rtnList[i] = currNd.getValue()
+				i += 1
 				currNd = currNd.getNext()
-		return ll
+		return rtnList
 
 	# check if a value exists in the linked list
 	def hasNode(self, value):

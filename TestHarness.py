@@ -37,7 +37,7 @@ exchange_data = json.load(exchangeFile)
 # for data in count:
 # 	print(data, count[data])
 
-for data in exchange_data['symbols']:
+for data in exchange_data['symbols'][:300]:
 	baseAsset = data['baseAsset']
 	quoteAsset = data['quoteAsset']
 	status = data['status']
@@ -48,7 +48,7 @@ for data in exchange_data['symbols']:
 	graph.addEdge(baseAsset, quoteAsset, status)
 print('Asset data has been loaded')
 
-for data in trade_data:
+for data in trade_data[:300]:
 	tradeName = data['symbol']
 	tradeEdge = graph.getTradeEdge(tradeName)
 	fromVertex = tradeEdge.getFromVertex()

@@ -204,15 +204,7 @@ class DSAGraphNode():
 	
 	# Retuning the adjacent vertex list
 	def getAdjacent(self):
-		if self.adjacents.isEmpty():
-			adjacentList = np.array([])
-		else:
-			size = self.adjacents.count()
-			adjacentList = np.empty(size, dtype=object)
-			listOfVal = self.adjacents.listOfValues()
-			for i, val in enumerate(listOfVal):
-				adjacentList[i] = val
-		return adjacentList
+		return self.adjacents.listOfValues()
 	
 	# Checking if the given vertex is adjacent
 	def hasAdjacent(self, vertex):
