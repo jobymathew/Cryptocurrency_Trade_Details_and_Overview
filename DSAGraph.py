@@ -137,6 +137,8 @@ class DSAGraphNode():
 		self.totalVolume = 0
 		self.count = DSALinkedList()
 		self.totalCount = 0
+		self.weightedAvgPrice = DSALinkedList()
+		self.totalWeightedAvgPrice = 0
 	
 	# Returning the list of adjacents
 	def getAdjacents(self):
@@ -197,6 +199,20 @@ class DSAGraphNode():
 	def getAverageCount(self):
 		countOfItems = self.count.count()
 		return int(self.totalCount/countOfItems)
+	
+	# Adding the weighted average price to the list
+	def addWeightedAvgPrice(self, inWeightedAvgPrice):
+		self.weightedAvgPrice.insertLast(inWeightedAvgPrice)
+		self.totalWeightedAvgPrice += float(inWeightedAvgPrice)
+	
+	# Getting the total weightedAvgPrice
+	def getTotalWeightedAvgPrice(self):
+		return self.totalWeightedAvgPrice
+	
+	# Getting the average weightedAvgPrice
+	def getAverageWeightedAvgPrice(self):
+		countOfItems = self.weightedAvgPrice.count()
+		return float(self.totalWeightedAvgPrice/countOfItems)
 
 	# Returning the label of the graph node
 	def getLabel(self):
@@ -314,7 +330,7 @@ class DSAGraph():
 		vertex = self.findVertex(label)
 		return vertex
 	
-	# Returning a vertex in the graph
+	# Returning an edge in the graph
 	def getEdge(self, label1, label2):
 		edge = None
 		vertex1 = self.findVertex(label1)
@@ -466,14 +482,18 @@ class DSAGraph():
 			edgesList = self.listOfEdgeValues()
 			print(edgesList)
 	
-	# List of vertices in the graph
-	def listOfVertices(self):
+	# List of vertex labels in the graph
+	def listOfVerticeLabels(self):
 		vertexList = self.vertices.listOfValues()
 		rtnList = np.empty(self.vertices.count(), dtype=object)
 		if vertexList.size != 0:
 			for i, val in enumerate(vertexList):
 				rtnList[i] = val.getLabel()
 		return rtnList
+	
+	# List of vertices in the graph
+	def listOfVertices(self):
+		return self.vertices.listOfValues()
 	
 	# List of filtered assets in the graph
 	def listOfFilterAssets(self):
@@ -497,6 +517,42 @@ class DSAGraph():
 	def getFirstVertex(self):
 		return self.vertices.peekFirst()
 	
+	def getAssetOverview(self):
+		# Getting the list of vertices
+		vertices = self.listOfVertices()
+		highestTotalWeightedAvgPrice = np.empty(10, dtype=object)
+		highestTotalWeightedAvgPriceLabels = np.empty(10, dtype=object)
+		highestTotalPriceChange = np.empty(10, dtype=object)
+		highestTotalPriceChangeLabels = np.empty(10, dtype=object)
+		highestTotalPriceChangePercent = np.empty(10, dtype=object)
+		highestTotalPriceChangePercentLabels = np.empty(10, dtype=object)
+		highestTotalVolume = np.empty(10, dtype=object)
+		highestTotalVolumeLabels = np.empty(10, dtype=object)
+		highestTotalCount = np.empty(10, dtype=object)
+		highestTotalCountLabels = np.empty(10, dtype=object)
+
+		for vertex in vertices:
+			label = vertex.getLabel()
+			if self.filterAssets.hasNode(label):
+				self.insertHighValue(label, vertex.totalWeightedAvgPrice, highestTotalWeightedAvgPrice, highestTotalWeightedAvgPriceLabels)
+				self.insertHighValue(label, vertex.totalPriceChange, highestTotalPriceChange, highestTotalPriceChangeLabels)
+				self.insertHighValue(label, vertex.totalPriceChangePercent, highestTotalPriceChangePercent, highestTotalPriceChangePercentLabels)
+				self.insertHighValue(label, vertex.totalVolume, highestTotalVolume, highestTotalVolumeLabels)
+				self.insertHighValue(label, vertex.totalCount, highestTotalCount, highestTotalCountLabels)
+		
+		# Printing out the top 10 values
+		print('\nTop 10 Total Weighted Average Labels')
+		self.displayOverview(highestTotalWeightedAvgPriceLabels, highestTotalWeightedAvgPrice)
+		print('\nTop 10 Total Price Change')
+		self.displayOverview(highestTotalPriceChangeLabels, highestTotalPriceChange)
+		print('\nTop 10 Total Price Change Precent')
+		self.displayOverview(highestTotalPriceChangePercentLabels, highestTotalPriceChangePercent)
+		print('\nTop 10 Total Volume')
+		self.displayOverview(highestTotalVolumeLabels, highestTotalVolume)
+		print('\nTop 10 Total Count')
+		self.displayOverview(highestTotalCountLabels, highestTotalCount)
+
+	
 	# Shifting down values in the given array 
 	def shiftDown(self, position, highValues, highLabels):
 		for i in range(position+1, highValues.size):
@@ -519,7 +575,7 @@ class DSAGraph():
 			i += 1
 	
 	# Displaying the trade overview details
-	def displayTradeOverview(self, labels, values):
+	def displayOverview(self, labels, values):
 		for i in range(labels.size):
 			print(f'{i+1}. {labels[i]} - {values[i]}')
 		print()
@@ -563,23 +619,23 @@ class DSAGraph():
 				self.insertHighValue(label, edge.count, highestCount, highestCountLabels)
 		# Printing out the top 10 values
 		print('\nTop 10 Price Change')
-		self.displayTradeOverview(highestPriceChangeLabels, highestPriceChange)
+		self.displayOverview(highestPriceChangeLabels, highestPriceChange)
 		print('\nTop 10 Price Change Precent')
-		self.displayTradeOverview(highestPriceChangePercentLabels, highestPriceChangePercent)
+		self.displayOverview(highestPriceChangePercentLabels, highestPriceChangePercent)
 		print('\nTop 10 Weighted Average Price')
-		self.displayTradeOverview(highestWeightedAvgPriceLabels, highestWeightedAvgPrice)
+		self.displayOverview(highestWeightedAvgPriceLabels, highestWeightedAvgPrice)
 		print('\nTop 10 Open Price')
-		self.displayTradeOverview(highestOpenPriceLabels, highestOpenPrice)
+		self.displayOverview(highestOpenPriceLabels, highestOpenPrice)
 		print('\nTop 10 High Price')
-		self.displayTradeOverview(highestHighPriceLabels, highestWeightedAvgPrice)
+		self.displayOverview(highestHighPriceLabels, highestWeightedAvgPrice)
 		print('\nTop 10 Low Price')
-		self.displayTradeOverview(highestLowPriceLabels, highestLowPrice)
+		self.displayOverview(highestLowPriceLabels, highestLowPrice)
 		print('\nTop 10 Volume');
-		self.displayTradeOverview(highestVolumeLabels, highestVolume)
+		self.displayOverview(highestVolumeLabels, highestVolume)
 		print('\nTop 10 Quote Volume');
-		self.displayTradeOverview(highestQuoteVolumeLabels, highestQuoteVolume)
+		self.displayOverview(highestQuoteVolumeLabels, highestQuoteVolume)
 		print('\nTop 10 Count');
-		self.displayTradeOverview(highestCountLabels, highestCount)
+		self.displayOverview(highestCountLabels, highestCount)
 
 
 if __name__ == '__main__':

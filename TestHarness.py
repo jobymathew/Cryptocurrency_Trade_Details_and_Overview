@@ -56,16 +56,17 @@ for data in trade_data[:300]:
 	priceChangePercent = data['priceChangePercent']
 	volume = data['volume']
 	count = data['count']
+	weightedAvgPrice = data['weightedAvgPrice']
 	# Adding data to the node class
 	fromVertex.addVolume(volume)
 	fromVertex.addPriceChangePercent(priceChangePercent)
 	fromVertex.addPriceChange(priceChange)
 	fromVertex.addCount(count)
+	fromVertex.addWeightedAvgPrice(weightedAvgPrice)
 	quoteVolume = data['quoteVolume']
 	lowPrice = data['lowPrice']
 	highPrice = data['highPrice']
 	openPrice = data['openPrice']
-	weightedAvgPrice = data['weightedAvgPrice']
 	# Adding data to the edge class
 	tradeEdge.setVolume(volume)
 	tradeEdge.setPriceChange(priceChange)
@@ -135,32 +136,32 @@ print('Trade data has been loaded')
 # 		print()
 # 		tradePath = tradePath.getNext()	
 
-choice = 0
-# Getting the input from the user
-print('\nEnter 1 for including an asset and 2 for ignoring an asset')
-while(choice != 1 and choice != 2):
-	choice = int(input())
-	if choice!= 1 and choice!= 2:
-		print('Wrong input, please try again\n')
-print('Enter the asset name')
-asset = input()
-if choice == 1:
-	# checking if the asset is already present, else collecting it from the graph and adding it to filter graph
-	if graph.hasVertex(asset):
-		print(f'{asset} already present in the graph')
-	else:
-		graph.addAsset(asset)
-		print(f'{asset} has been included in the graph')
-else:
-	# removing the asset and its edges if it is present in the graph
-	if graph.hasVertex(asset):
-		graph.ignoreAsset(asset)
-		print(f'{asset} has been ignored from the graph')
-	else:
-		print(f'{asset} already ignored from the graph')
+# choice = 0
+# # Getting the input from the user
+# print('\nEnter 1 for including an asset and 2 for ignoring an asset')
+# while(choice != 1 and choice != 2):
+# 	choice = int(input())
+# 	if choice!= 1 and choice!= 2:
+# 		print('Wrong input, please try again\n')
+# print('Enter the asset name')
+# asset = input()
+# if choice == 1:
+# 	# checking if the asset is already present, else collecting it from the graph and adding it to filter graph
+# 	if graph.hasVertex(asset):
+# 		print(f'{asset} already present in the graph')
+# 	else:
+# 		graph.addAsset(asset)
+# 		print(f'{asset} has been included in the graph')
+# else:
+# 	# removing the asset and its edges if it is present in the graph
+# 	if graph.hasVertex(asset):
+# 		graph.ignoreAsset(asset)
+# 		print(f'{asset} has been ignored from the graph')
+# 	else:
+# 		print(f'{asset} already ignored from the graph')
 
-print('Trade Overview')
-graph.getTradeOverview()
+print('Asset Overview')
+graph.getAssetOverview()
 
 # print(graph.hasVertex(asset))
 

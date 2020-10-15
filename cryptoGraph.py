@@ -62,16 +62,17 @@ def loadTradeData():
 		priceChangePercent = data['priceChangePercent']
 		volume = data['volume']
 		count = data['count']
+		weightedAvgPrice = data['weightedAvgPrice']
 		# Adding data to the node class
 		fromVertex.addVolume(volume)
 		fromVertex.addPriceChangePercent(priceChangePercent)
 		fromVertex.addPriceChange(priceChange)
 		fromVertex.addCount(count)
+		fromVertex.addWeightedAvgPrice(weightedAvgPrice)
 		quoteVolume = data['quoteVolume']
 		lowPrice = data['lowPrice']
 		highPrice = data['highPrice']
 		openPrice = data['openPrice']
-		weightedAvgPrice = data['weightedAvgPrice']
 		# Adding data to the edge class
 		tradeEdge.setVolume(volume)
 		tradeEdge.setPriceChange(priceChange)
@@ -137,7 +138,9 @@ def displayAssetDetails():
 		if (vertex.getTotalPriceChange() == 0):
 			print('No data as there is no trading')
 		else:
-			print('\n24H Total Price Change :', vertex.getTotalPriceChange())
+			print('\n24H Total Weighted Average Price :', vertex.getTotalWeightedAvgPrice())
+			print('24H Average Weighted Average Price :', vertex.getAverageWeightedAvgPrice())
+			print('24H Total Price Change :', vertex.getTotalPriceChange())
 			print('24H Average Price Change :', vertex.getAveragePriceChange())
 			print('24H Average Price Percent Change : ', vertex.getAveragePriceChangePercent())
 			print('24H Total Volume traded :', vertex.getTotalVolume())
