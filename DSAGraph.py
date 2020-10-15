@@ -465,27 +465,25 @@ class DSAGraph():
 	# List of vertices in the graph
 	def listOfVertices(self):
 		vertexList = self.vertices.listOfValues()
-		ll = []
-		for val in vertexList:
-			ll.append(val.getLabel())
-		return ll
+		rtnList = np.empty(self.vertices.count(), dtype=object)
+		if vertexList.size != 0:
+			for i, val in enumerate(vertexList):
+				rtnList[i] = val.getLabel()
+		return rtnList
 	
 	# List of filtered assets in the graph
 	def listOfFilteredAssets(self):
-		assetList = self.filterAssets.listOfValues()
-		ll = []
-		for val in assetList:
-			ll.append(val)
-		return ll
+		return self.filterAssets.listOfValues()
 	
 	# List of vertices in the graph
 	def listOfEdges(self):
 		edgeList = self.edges.listOfValues()
-		ll = []
-		for edge in edgeList:
-			output = f'{edge.getFromVertex().getLabel()}{edge.getToVertex().getLabel()}'
-			ll.append(output)
-		return ll
+		rtnList = np.empty(self.edges.count(), dtype=object)
+		if edgeList.size != 0:
+			for i, edge in enumerate(edgeList):
+				output = f'{edge.getFromVertex().getLabel()}{edge.getToVertex().getLabel()}'
+				rtnList[i] = output
+		return rtnList
 	
 	# Getting the first vertex of the graph
 	def getFirstVertex(self):

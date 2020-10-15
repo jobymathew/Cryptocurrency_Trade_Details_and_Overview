@@ -78,6 +78,19 @@ for data in trade_data[:300]:
 	tradeEdge.setWeightedAvgPrice(weightedAvgPrice)
 print('Trade data has been loaded')
 
+# print('Testing list of vertices')
+# vertexList = graph.listOfVertices()
+# print(vertexList)
+
+# print('Testing list of filtered assets')
+# assetList = graph.listOfFilteredAssets()
+# print(assetList)
+
+# print("Testing list of edges")
+# edgesList = graph.listOfEdges()
+# print(edgesList)
+
+
 # for _ in range(5):
 # 	print("Input the asset name")
 # 	assetName = input()
