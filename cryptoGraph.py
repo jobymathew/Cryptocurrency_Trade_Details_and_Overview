@@ -18,23 +18,12 @@ import json
 # exchangeInfo = requests.get('https://www.binance.com/api/v3/exchangeInfo')
 # tokenTrades = requests.get('https://www.binance.com/api/v3/trades?symbol=ETHBTC')
 
-# declaring the graph object
-graph = DSAGraph()
-
-# Converting to json
-tradeFile = open('trade_file.json')
-exchangeFile = open('asset_file.json')
-trade_data = json.load(tradeFile)
-exchange_data = json.load(exchangeFile)
-# tokenTrades_data = tokenTrades.json()
-
-
 # Setting up the argument parser
 ap = argparse.ArgumentParser()
 # Adding the argument for interactive test enviornment
 ap.add_argument("-i", "--interactive", help='interactive testing enviornment', action='store_true')
 # Adding the argument for report mode
-ap.add_argument("-r", "--report", help='report mode', action='store_true')
+ap.add_argument("-r", "--report", nargs='+', help='report mode')
 
 # Getting the argument variables
 args = vars(ap.parse_args())
@@ -50,7 +39,6 @@ def loadAssetData():
 		if not graph.hasVertex(quoteAsset):
 			graph.addVertex(quoteAsset, 0)
 		graph.addEdge(baseAsset, quoteAsset, status)
-	print('Asset data has been loaded')
 
 # Function to load the trade data
 def loadTradeData():
@@ -83,7 +71,6 @@ def loadTradeData():
 		tradeEdge.setOpenPrice(openPrice)
 		tradeEdge.setCount(count)
 		tradeEdge.setWeightedAvgPrice(weightedAvgPrice)
-	print('Trade data has been loaded')
 
 # Function to show the data loading options
 def getLoadOptions():
@@ -225,7 +212,16 @@ def assetFilter():
 
 # Entering the interactive mode
 if args['interactive']:
-	print('Entering interactive mode')
+
+	# declaring the graph object
+	graph = DSAGraph()
+
+	# Converting to json
+	tradeFile = open('trade_file.json')
+	exchangeFile = open('asset_file.json')
+	trade_data = json.load(tradeFile)
+	exchange_data = json.load(exchangeFile)
+
 	# selecting the choice from the menu driven options
 	choice = 0
 	while(choice != 9):
@@ -235,8 +231,10 @@ if args['interactive']:
 			getLoadOptions()
 		elif choice == 2:
 			displayAssetDetails()
+			print('Asset data has been loaded')
 		elif choice == 3:
 			displayTradeDetails()
+			print('Trade data has been loaded')
 		elif choice == 4:
 			displayTradePaths()
 		elif choice == 5:
@@ -255,7 +253,21 @@ if args['interactive']:
 
 # Entering the report mode
 elif args['report']:
-	print('Entering report mode')
+
+	# declaring the graph object
+	graph = DSAGraph()
+
+	# Converting to json
+	tradeFile = open(args['report'][1])
+	exchangeFile = open(args['report'][0])
+	trade_data = json.load(tradeFile)
+	exchange_data = json.load(exchangeFile)
+	loadAssetData()
+	loadTradeData()
+	print("\nAsset Overview")
+	graph.getAssetOverview()
+	print("\nTrade Overview")
+	graph.getTradeOverview()
 	
 
 	
