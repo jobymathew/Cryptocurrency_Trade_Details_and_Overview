@@ -239,9 +239,9 @@ if args['interactive']:
 		elif choice == 5:
 			assetFilter()
 		elif choice == 6:
-			print('asset overview')
+			graph.getAssetOverview()
 		elif choice == 7:
-			print('Trade overview')
+			graph.getTradeOverview()
 		elif choice == 8:
 			writeToSerializedFile()
 		elif choice == 9:

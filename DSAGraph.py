@@ -40,6 +40,10 @@ class DSAGraphEdge():
 	def getToVertex(self):
 		return self.toVertex
 	
+	# Function to return the label of the edge
+	def getEdgeLabel(self):
+		return self.fromVertex.getLabel()+self.toVertex.getLabel()
+	
 	# Function to return the status of the trade
 	def getStatus(self):
 		return self.status
@@ -77,8 +81,8 @@ class DSAGraphEdge():
 		return self.quoteVolume
 	
 	# Function to set the open price of the trade
-	def setOpenPrice(self, inQuoteVolume):
-		self.quoteVolume = inQuoteVolume
+	def setOpenPrice(self, inOpenPrice):
+		self.openPrice = inOpenPrice
 	
 	# Function to return the open price of the trade
 	def getOpenPrice(self):
@@ -329,7 +333,7 @@ class DSAGraph():
 	# Function to find the edge connecting the two assets
 	def getTradeEdge(self, tradeName):
 		edge = None
-		vertices = self.listOfFilteredAssets()
+		vertices = self.listOfFilterAssets()
 		for label1 in vertices:
 			for label2 in vertices:
 				if (label1+label2) == tradeName:
@@ -459,7 +463,7 @@ class DSAGraph():
 			
 		if not self.edges.isEmpty():
 			print('Edges of the graph')
-			edgesList = self.listOfEdges()
+			edgesList = self.listOfEdgeValues()
 			print(edgesList)
 	
 	# List of vertices in the graph
@@ -472,11 +476,15 @@ class DSAGraph():
 		return rtnList
 	
 	# List of filtered assets in the graph
-	def listOfFilteredAssets(self):
+	def listOfFilterAssets(self):
 		return self.filterAssets.listOfValues()
 	
-	# List of vertices in the graph
+	# List of filtered assets in the graph
 	def listOfEdges(self):
+		return self.edges.listOfValues()
+	
+	# List of edge values in the graph
+	def listOfEdgeValues(self):
 		edgeList = self.edges.listOfValues()
 		rtnList = np.empty(self.edges.count(), dtype=object)
 		if edgeList.size != 0:
@@ -489,15 +497,90 @@ class DSAGraph():
 	def getFirstVertex(self):
 		return self.vertices.peekFirst()
 	
-	# Finding a not visited vertex in the adjacent list
-	def getNotVisitedVertices(self, adjacent):
-		ll = []
-		if adjacent:
-			for val in adjacent:
-				vertex = self.findVertex(val)
-				if not vertex.getVisited():
-					ll.append(vertex)
-		return ll
+	# Shifting down values in the given array 
+	def shiftDown(self, position, highValues, highLabels):
+		for i in range(position+1, highValues.size):
+			highValues[position], highValues[i] = highValues[i], highValues[position]
+			highLabels[position], highLabels[i] = highLabels[i], highLabels[position]
+	
+	# Inserting the value into the array
+	def insertHighValue(self, inLabel, inValue, highValues, highLabels):
+		isInserted, i = False, 0
+		while (not isInserted) and (i<highValues.size):
+			if highValues[i] == None:
+				highValues[i] = float(inValue)
+				highLabels[i] = inLabel
+				isInserted = True
+			elif float(inValue) > highValues[i]:
+				self.shiftDown(i, highValues, highLabels)
+				highValues[i] = float(inValue)
+				highLabels[i] = inLabel
+				isInserted = True
+			i += 1
+	
+	# Displaying the trade overview details
+	def displayTradeOverview(self, labels, values):
+		for i in range(labels.size):
+			print(f'{i+1}. {labels[i]} - {values[i]}')
+		print()
+
+					
+	# Finding the Trade overview details
+	def getTradeOverview(self):
+		# Getting the list of edges
+		edgeList = self.listOfEdges()
+		highestPriceChange = np.empty(10, dtype=object)
+		highestPriceChangeLabels = np.empty(10, dtype=object)
+		highestPriceChangePercent = np.empty(10, dtype=object)
+		highestPriceChangePercentLabels = np.empty(10, dtype=object)
+		highestWeightedAvgPrice = np.empty(10, dtype=object)
+		highestWeightedAvgPriceLabels = np.empty(10, dtype=object)
+		highestOpenPrice = np.empty(10, dtype=object)
+		highestOpenPriceLabels = np.empty(10, dtype=object)
+		highestHighPrice = np.empty(10, dtype=object)
+		highestHighPriceLabels = np.empty(10, dtype=object)
+		highestLowPrice = np.empty(10, dtype=object)
+		highestLowPriceLabels = np.empty(10, dtype=object)
+		highestVolume = np.empty(10, dtype=object)
+		highestVolumeLabels = np.empty(10, dtype=object)
+		highestQuoteVolume = np.empty(10, dtype=object)
+		highestQuoteVolumeLabels = np.empty(10, dtype=object)
+		highestCount = np.empty(10, dtype=object)
+		highestCountLabels = np.empty(10, dtype=object)
+		for edge in edgeList:
+			label = edge.getEdgeLabel()
+			fromVertex = edge.getFromVertex().getLabel()
+			toVertex = edge.getToVertex().getLabel()
+			if self.filterAssets.hasNode(fromVertex) and self.filterAssets.hasNode(toVertex):
+				self.insertHighValue(label, edge.priceChange, highestPriceChange, highestPriceChangeLabels)
+				self.insertHighValue(label, edge.priceChangePercent, highestPriceChangePercent, highestPriceChangePercentLabels)
+				self.insertHighValue(label, edge.weightedAvgPrice, highestWeightedAvgPrice, highestWeightedAvgPriceLabels)
+				self.insertHighValue(label, edge.openPrice, highestOpenPrice, highestOpenPriceLabels)
+				self.insertHighValue(label, edge.highPrice, highestHighPrice, highestHighPriceLabels)
+				self.insertHighValue(label, edge.lowPrice, highestLowPrice, highestLowPriceLabels)
+				self.insertHighValue(label, edge.volume, highestVolume, highestVolumeLabels)
+				self.insertHighValue(label, edge.quoteVolume, highestQuoteVolume, highestQuoteVolumeLabels)
+				self.insertHighValue(label, edge.count, highestCount, highestCountLabels)
+		# Printing out the top 10 values
+		print('\nTop 10 Price Change')
+		self.displayTradeOverview(highestPriceChangeLabels, highestPriceChange)
+		print('\nTop 10 Price Change Precent')
+		self.displayTradeOverview(highestPriceChangePercentLabels, highestPriceChangePercent)
+		print('\nTop 10 Weighted Average Price')
+		self.displayTradeOverview(highestWeightedAvgPriceLabels, highestWeightedAvgPrice)
+		print('\nTop 10 Open Price')
+		self.displayTradeOverview(highestOpenPriceLabels, highestOpenPrice)
+		print('\nTop 10 High Price')
+		self.displayTradeOverview(highestHighPriceLabels, highestWeightedAvgPrice)
+		print('\nTop 10 Low Price')
+		self.displayTradeOverview(highestLowPriceLabels, highestLowPrice)
+		print('\nTop 10 Volume');
+		self.displayTradeOverview(highestVolumeLabels, highestVolume)
+		print('\nTop 10 Quote Volume');
+		self.displayTradeOverview(highestQuoteVolumeLabels, highestQuoteVolume)
+		print('\nTop 10 Count');
+		self.displayTradeOverview(highestCountLabels, highestCount)
+
 
 if __name__ == '__main__':
 	print("------------Graphs-----------\n")
