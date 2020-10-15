@@ -120,12 +120,16 @@ class DSALinkedList():
 		if self.isEmpty():
 			print("The List is empty")
 		else:
+			if self.head.getValue() == inValue:
+				self.head = self.head.getNext() 
 			rmNd = self.head
-			while(rmNd != None):
-				if rmNd.getValue() == inValue:
-					rmNd.getPrev().setNext(rmNd.getNext())
+			while(rmNd.getNext() != None and rmNd.getValue() != inValue):
+				prevNd = rmNd
 				rmNd = rmNd.getNext()
-			return rmNd
+			if rmNd.getValue() == inValue:
+				prevNd.setNext(prevNd.getNext().getNext())
+				if prevNd.getNext() != None:
+					prevNd.getNext().setPrev(prevNd)
 	
 	#iterate the elements of the list
 	def __iter__(self):
@@ -162,14 +166,14 @@ class DSALinkedList():
 		return ll
 
 	# check if a value exists in the linked list
-	def search(self, value):
+	def hasNode(self, value):
 		isFound = False
 		currNd = self.head
 		if not(self.isEmpty()):
 			while(currNd != None):
 				if currNd.getValue() == value:
 					isFound = True
-					currNd = currNd.getNext()
+				currNd = currNd.getNext()
 		return isFound
 	
 	# Finding a value in the linked list

@@ -7,6 +7,7 @@
 
 from LinkedList import DSALinkedList
 from StackQueue import DSAStack, DSAQueue
+import numpy as np
 # importing sys to increase the recursion limit
 import sys
 sys.setrecursionlimit(10**6) 
@@ -17,19 +18,19 @@ import copy
 class DSAGraphEdge():
 	
 	# initializing the constructor
-	def __init__(self, fromVertex, toVertex, status, volume=0, quoteVolume=0, count=0, weightedPrice=0, openPrice=0, highPrice=0, lowPrice=0, priceChange=0, priceChangePercent=0):
+	def __init__(self, fromVertex, toVertex, status):
 		self.fromVertex = fromVertex
 		self.toVertex = toVertex
 		self.status = status
-		self.volume = volume
-		self.quoteVolume = quoteVolume
-		self.count = count
-		self.weightedAvgPrice = weightedAvgPrice
-		self.openPrice = openPrice
-		self.highPrice = highPrice
-		self.lowPrice = lowPrice
-		self.priceChange = priceChange
-		self.priceChangePercent = priceChangePercent
+		self.volume = 0
+		self.quoteVolume = 0
+		self.count = 0
+		self.weightedAvgPrice = 0
+		self.openPrice = 0
+		self.highPrice = 0
+		self.lowPrice = 0
+		self.priceChange = 0
+		self.priceChangePercent = 0
 	
 	# Function to return the value of from vertex
 	def getFromVertex(self):
@@ -119,23 +120,23 @@ class DSAGraphEdge():
 class DSAGraphNode():
 
 	# initializing the graph
-	def __init__(self, inLabel, inValue, edges=DSALinkedList(), visited=False, priceChange=DSALinkedList(), totalPriceChange=0, priceChangePercent=DSALinkedList(), totalPriceChangePercent=0, volume=DSALinkedList(), totalVolume=0, count=DSALinkedList(), totalCount=0 ):
+	def __init__(self, inLabel, inValue):
 		self.label = inLabel
 		self.value = inValue
-		self.edges = edges
-		self.visited = visited
-		self.priceChange = priceChange
-		self.totalPriceChange = totalPriceChange
-		self.priceChangePercent = priceChangePercent
-		self.totalPriceChangePercent = totalPriceChangePercent
-		self.volume = volume
-		self.totalVolume = totalVolume
-		self.count = count
-		self.totalCount = totalCount
+		self.adjacents = DSALinkedList()
+		self.visited = False
+		self.priceChange = DSALinkedList()
+		self.totalPriceChange = 0
+		self.priceChangePercent = DSALinkedList()
+		self.totalPriceChangePercent = 0
+		self.volume = DSALinkedList()
+		self.totalVolume = 0
+		self.count = DSALinkedList()
+		self.totalCount = 0
 	
-	# Returning the list of edges
-	def getEdges(self):
-		return self.edges
+	# Returning the list of adjacents
+	def getAdjacents(self):
+		return self.adjacents
 	
 	# Adding the price change to the list
 	def addPriceChange(self, inPriceChange):
@@ -203,15 +204,24 @@ class DSAGraphNode():
 	
 	# Retuning the adjacent vertex list
 	def getAdjacent(self):
-		if self.edges.isEmpty():
-			val = None
+		if self.adjacents.isEmpty():
+			adjacentList = np.array([])
 		else:
-			val = self.edges.listOfValues()
-		return val
+			size = self.adjacents.count()
+			adjacentList = np.empty(size, dtype=object)
+			listOfVal = self.adjacents.listOfValues()
+			for i, val in enumerate(listOfVal):
+				adjacentList[i] = val
+		return adjacentList
+	
+	# Checking if the given vertex is adjacent
+	def hasAdjacent(self, vertex):
+		return self.adjacents.hasNode(vertex)
 	
 	# Adding an edge to the graph node
-	def addEdge(self, vertex):
-		self.edges.insertLast(vertex)
+	def addAdjacent(self, vertex):
+		if vertex != self.getLabel():
+			self.adjacents.insertLast(vertex)
 	
 	# Setting the graph node as visited
 	def setVisited(self):
@@ -232,44 +242,46 @@ class DSAGraph():
 	def __init__(self):
 		self.vertices = DSALinkedList()
 		self.edges = DSALinkedList()
+		self.filterAssets = DSALinkedList()
 	
 	# Finding a vertex in the graph
 	def findVertex(self, value):
 		vertex = None
-		currVertex = self.vertices.head
-		if not(self.vertices.isEmpty()):
-			while(currVertex != None):
-				if currVertex.getValue().getLabel() == value:
-					vertex = currVertex.getValue()
-				currVertex = currVertex.getNext()
+		# Finding the vertex if it is present in the list of filtered assets
+		if self.filterAssets.hasNode(value):
+			currVertex = self.vertices.head
+			if not(self.vertices.isEmpty()):
+				while(currVertex != None):
+					if currVertex.getValue().getLabel() == value:
+						vertex = currVertex.getValue()
+					currVertex = currVertex.getNext()
 		return vertex
 	
 	# Finding an edge in the graph
 	def findEdge(self, fromValue, toValue):
 		edge = None
-		currEdge = self.edges.head
-		if not(self.edges.isEmpty()):
-			while(currEdge != None):
-				if currEdge.getValue().getFromVertex() == fromValue and currEdge.getValue().getToVertex() == toValue:
-					edge = currEdge.getValue()
-				currEdge = currEdge.getNext()
+		# Finding the edge if it is present in the list of filterd assets
+		if self.filterAssets.hasNode(fromValue.getLabel()) and self.filterAssets.hasNode(toValue.getLabel()):
+			currEdge = self.edges.head
+			if not(self.edges.isEmpty()):
+				while(currEdge != None):
+					if currEdge.getValue().getFromVertex() == fromValue and currEdge.getValue().getToVertex() == toValue:
+						edge = currEdge.getValue()
+					currEdge = currEdge.getNext()
 		return edge
 
 	# Adding a vertex into the graph
 	def addVertex(self, label, value):
 		vertex = DSAGraphNode(label, value)
 		self.vertices.insertLast(vertex)
-	
-	# Adding a copy of the given vertex into the graph
-	def addVertexCopy(self, inVertex):
-		vertex = DSAGraphNode(inVertex.getLabel(), inVertex.getValue(), inVertex.getEdges(), inVertex.getVisited(), inVertex.getPriceChange(), inVertex.getTotalPriceChange(), inVertex.getPriceChangePercent(), inVertex.getTotalPriceChangePercent(), inVertex.getVolume(), inVertex.getTotalVolume(), inVertex.getTotalCount())
-		self.vertices.insertLast(vertex)
+		self.filterAssets.insertLast(label)
 
 	# Adding an edge into the graph
 	def addEdge(self, label1, label2, status):
 		vertex1 = self.findVertex(label1)
 		vertex2 = self.findVertex(label2)
-		vertex1.addEdge(label2)
+		# if not vertex1.hasAdjacent(label2):
+		vertex1.addAdjacent(label2)
 		# vertex2.addEdge(label1)
 		# edge = (label1, label2)
 		edge = DSAGraphEdge(vertex1, vertex2, status)
@@ -308,9 +320,11 @@ class DSAGraph():
 	
 	# Returning a vertex in the graph
 	def getEdge(self, label1, label2):
+		edge = None
 		vertex1 = self.findVertex(label1)
 		vertex2 = self.findVertex(label2)
-		edge = self.findEdge(vertex1, vertex2)
+		if vertex1 != None and vertex2 != None:
+			edge = self.findEdge(vertex1, vertex2)
 		return edge
 	
 	# Function to check if there is a trade edge in the graph
@@ -323,42 +337,12 @@ class DSAGraph():
 	# Function to find the edge connecting the two assets
 	def getTradeEdge(self, tradeName):
 		edge = None
-		vertices = self.listOfVertices()
+		vertices = self.listOfFilteredAssets()
 		for label1 in vertices:
 			for label2 in vertices:
 				if (label1+label2) == tradeName:
 					edge = self.getEdge(label1, label2)
 		return edge
-	
-	# Returning the list of edges having the input asset
-	def getAllEdges(self, asset):
-		edgesWithAsset = DSALinkedList()
-		# Getting the list of vertices
-		vertices = self.listOfVertices()
-		for label in vertices:
-			if self.hasTradeEdge(label+asset):
-				edge = self.getEdge(label, asset)
-				edgesWithAsset.insertLast(edge)
-			if self.hasTradeEdge(asset+label):
-				edge = self.getEdge(asset, label)
-				edgeWithAsset.insertLast(edge)
-		return edgesWithAsset
-	
-	# Adding a trade edge copy into the graph with an edge as input
-	def addEdgeCopy(self, inEdge):
-		vertex1 = self.findVertex(inEdge.getFromVertex())
-		vertex2 = self.findVertex(inEdge.getToVertex())
-		vertex1.addEdge(inEdge.getToVertex())
-		# Getting all the values from the edge and creating a new edge
-		edge = DSAGraphEdge(inEdge.getFromVertex(), inEdge.getToVertex(), inEdge.getStatus(), inEdge.getVolume(), inEdge.getQuoteVolume(), inEdge.getCount(), inEdge.getWeightedPrice, inEdge.getOpenPrice, inEdge.getHighPrice(), inEdge.getLowPrice(), inEdge.getPriceChange(), inEdge.getPriceChangePercent())
-		self.edges.insertLast(edge)
-
-	# Adding the list of edges to the graph
-	def addAllEdges(self, inEdges):
-		edgeHead = inEdges.head
-		while(edgeHead != None):
-			self.addTradeEdge(edgeHead.getValue())
-			edgeHead = edgeHead.getNext()
 	
 	# Function to remove a vertex from a graph
 	def removeVertex(self, inVertex):
@@ -366,7 +350,13 @@ class DSAGraph():
 		self.vertices.delete(vertex)
 		# unfinished
 	
-	# removeAllEdges function
+	# ignore the given asset
+	def ignoreAsset(self, inAsset):
+		self.filterAssets.remove(inAsset);
+	
+	# readd the given asset
+	def addAsset(self, inAsset):
+		self.filterAssets.insertLast(inAsset);
 	
 	# Function to check if the trade edge is tradeable
 	def isTrading(self, tradeName):
@@ -383,35 +373,46 @@ class DSAGraph():
 		vertex = self.getVertex(label)
 		# Marking the vertex as visited
 		vertex.setVisited()
-		adjData = self.getAdjacent(label)  
+		adjData = self.getAdjacent(label) 
 		# Checking if the adjacent list is not none and the trade path is not break            
-		if adjData != None and self.isTrading(label+quoteAsset):
-			if quoteAsset in adjData:
-				# adding the quote asset to the path and appending to the trade list
-				foundPath = copy.deepcopy(labels)
-				foundPath.insertLast(quoteAsset)
-				tradeList.insertLast(foundPath)
-				# remove the quote asset from the list
-				adjData.remove(quoteAsset)
-			for val in adjData:
-				newVertex = self.getVertex(val)
-				# If the selected vertex is not visited, it is then added to the labels list and recursed for a new trade path
-				if not newVertex.getVisited():
-					newLabels = copy.deepcopy(labels)
-					newLabels.insertLast(val)
-					tradeList = self._getPaths(newLabels, tradeList, quoteAsset)
+		if adjData.size != 0 or self.isTrading(label+quoteAsset):
+				for i, val in enumerate(adjData):
+					if val == quoteAsset:
+						# adding the quote asset to the path and appending to the trade list
+						foundPath = copy.deepcopy(labels)
+						foundPath.insertLast(quoteAsset)
+						tradeList.insertLast(foundPath)
+						# remove the quote asset from the list
+						adjData = np.delete(adjData, i)
+					elif self.filterAssets.hasNode(val):
+						newVertex = self.getVertex(val)
+						# If the selected vertex is not visited, it is then added to the labels list and recursed for a new trade path
+						if not newVertex.getVisited():
+							newLabels = copy.deepcopy(labels)
+							newLabels.insertLast(val)
+							tradeList = self._getPaths(newLabels, tradeList, quoteAsset)
 		return tradeList
 	
 	# Function to get the indirect trade path between two assets
 	def getTradePaths(self, baseAsset, quoteAsset):
+		self.clearAllVisited()
+		resList = DSALinkedList()
 		# Initializing the list
-		tradeList = DSALinkedList()
-		labelList = DSALinkedList()
-		labelList.insertLast(baseAsset)
-		# Calling the recursive function
-		resList = self._getPaths(labelList, tradeList, quoteAsset)
+		if self.filterAssets.hasNode(baseAsset) and self.filterAssets.hasNode(quoteAsset):
+			tradeList = DSALinkedList()
+			labelList = DSALinkedList()
+			labelList.insertLast(baseAsset)
+			# Calling the recursive function
+			resList = self._getPaths(labelList, tradeList, quoteAsset)
 		# returning the list
 		return resList
+	
+	# Clearing all the visited vertices
+	def clearAllVisited(self):
+		vertices = self.filterAssets.listOfValues()
+		for label in vertices:
+			vertex = self.getVertex(label)
+			vertex.clearVisited()
 
 	# Retruning the list of adjacent vertices of the vertex - returns the label
 	def getAdjacent(self, label):
@@ -475,6 +476,14 @@ class DSAGraph():
 		ll = []
 		for val in vertexList:
 			ll.append(val.getLabel())
+		return ll
+	
+	# List of filtered assets in the graph
+	def listOfFilteredAssets(self):
+		assetList = self.filterAssets.listOfValues()
+		ll = []
+		for val in assetList:
+			ll.append(val)
 		return ll
 	
 	# List of vertices in the graph

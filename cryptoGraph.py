@@ -20,7 +20,6 @@ import json
 
 # declaring the graph object
 graph = DSAGraph()
-filterGraph = None
 
 # Converting to json
 tradeFile = open('trade_file.json')
@@ -83,8 +82,6 @@ def loadTradeData():
 		tradeEdge.setOpenPrice(openPrice)
 		tradeEdge.setCount(count)
 		tradeEdge.setWeightedAvgPrice(weightedAvgPrice)
-	# Making a copy of the graph 
-	filterGraph = copy.deepcopy(graph)
 	print('Trade data has been loaded')
 
 # Function to show the data loading options
@@ -110,8 +107,8 @@ def displayTradeDetails():
 	print("Input the trade name")
 	tradeName = input()
 	# Checking if trade edge exists
-	if filterGraph.hasTradeEdge(tradeName):
-		graphEdge = filterGraph.getTradeEdge(tradeName)
+	if graph.hasTradeEdge(tradeName):
+		graphEdge = graph.getTradeEdge(tradeName)
 		# Getting the two assets 
 		baseAsset = graphEdge.getFromVertex()
 		quoteAsset = graphEdge.getToVertex()
@@ -135,8 +132,8 @@ def displayTradeDetails():
 def displayAssetDetails():
 	print("Input the asset name")
 	assetName = input()
-	if filterGraph.hasVertex(assetName):
-		vertex = filterGraph.getVertex(assetName)
+	if graph.hasVertex(assetName):
+		vertex = graph.getVertex(assetName)
 		if (vertex.getTotalPriceChange() == 0):
 			print('No data as there is no trading')
 		else:
@@ -159,7 +156,7 @@ def displayTradePaths():
 	print("Enter the quote asset")
 	quoteAsset = input()
 	# Getting the trade list
-	tradeList = filterGraph.getTradePaths(baseAsset, quoteAsset)
+	tradeList = graph.getTradePaths(baseAsset, quoteAsset)
 	# Displaying the trade paths if present, else displaying no trade paths
 	if tradeList.isEmpty():
 		print('\nNo Trade Paths\n')
@@ -180,7 +177,7 @@ def readFromSerializedFile():
 		with open('serializedCrytoGraph.txt', 'rb') as dataFile:
 			#loading the file 
 			inGraph = pickle.load(dataFile)
-			filterGraph = inGraph
+			graph = inGraph
 			print("Graph has been read from the Serialized File")
 	except:
 		print("Error: object file does not exist")
@@ -194,6 +191,34 @@ def writeToSerializedFile():
 			print('Graph has been written into the serialized file')
 	except:
 		print("Error: problem pickling object!")
+
+# Function to filter an asset
+def assetFilter():
+	choice = 0
+	# Getting the input from the user
+	print('\nEnter 1 for including an asset and 2 for ignoring an asset')
+	while(choice != 1 and choice != 2):
+		choice = int(input())
+		if choice!= 1 and choice!= 2:
+			print('Wrong input, please try again\n')
+	print('Enter the asset name')
+	asset = input()
+	if choice == 1:
+		# checking if the asset is already present, else adding it back
+		if graph.hasVertex(asset):
+			print(f'{asset} already present in the graph')
+		else:
+			graph.addAsset(asset)
+			print(f'{asset} has been included in the graph')
+	else:
+		# ignoring the asset and its edges if it is present in the graph
+		if graph.hasVertex(asset):
+			graph.ignoreAsset(asset)
+			print(f'{asset} has been ignored from the graph')
+		else:
+			print(f'{asset} already ignored from the graph')
+
+
 
 # Entering the interactive mode
 if args['interactive']:
@@ -212,7 +237,7 @@ if args['interactive']:
 		elif choice == 4:
 			displayTradePaths()
 		elif choice == 5:
-			print('asset filter')
+			assetFilter()
 		elif choice == 6:
 			print('asset overview')
 		elif choice == 7:
