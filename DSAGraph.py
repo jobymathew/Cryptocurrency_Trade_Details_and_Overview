@@ -436,7 +436,7 @@ class DSAGraph():
 	
 	
 	# Function to find the exchange between the given assets - Note that this is a modified DFS 
-	def _getDetails(self, labels, exchangeList, pathExchange, quoteAsset):
+	def _getDetails(self, labels, exchangeArray, pathExchange, quoteAsset):
 		# Getting the last value from the labels list
 		label = labels.peekLast()
 		vertex = self.getVertex(label)
@@ -447,39 +447,53 @@ class DSAGraph():
 		if adjData.size != 0 or self.isTrading(label+quoteAsset):
 				for i, val in enumerate(adjData):
 					if val == quoteAsset:
+						# adding the quote asset to the path and appending to the trade list
+						foundPath = copy.deepcopy(labels)
+						foundPath.insertLast(quoteAsset)
+						exchangeArray[0].insertLast(foundPath)
 						# remove the quote asset from the list
 						adjData = np.delete(adjData, i)
 						# Adding the overall trade exchange
 						edge = self.getEdge(label, quoteAsset)
 						exchangeValue = edge.getPriceChange()
 						pathExchange += float(exchangeValue)
-						exchangeList.insertLast(pathExchange)
+						# exchangeList.insertLast(pathExchange)
+						exchangeArray[1].insertLast(pathExchange)
 					elif self.filterAssets.hasNode(val):
 						newVertex = self.getVertex(val)
 						# If the selected vertex is not visited, it is then added to the labels list and recursed for a new trade path
 						if not newVertex.getVisited():
 							# Adding the overall trade exchange
-							labels.insertLast(val)
+							newLabels = copy.deepcopy(labels)
+							newLabels.insertLast(val)
+							# labels.insertLast(val)
 							edge = self.getEdge(label, val)
 							exchangeValue = edge.getPriceChange()
 							pathExchange += float(exchangeValue)
-							exchangeList = self._getExchange(labels, exchangeList, pathExchange, quoteAsset)
-		return exchangeList
+							exchangeArray = self._getDetails(newLabels, exchangeArray, pathExchange, quoteAsset)
+		return exchangeArray
 	
 	# Function to get the overall between two assets
 	def getTradeDetails(self, baseAsset, quoteAsset):
 		self.clearAllVisited()
 		resList = DSALinkedList()
 		labelList = DSALinkedList()
+		# res = np.empty(2, dtype=object)
+		# res[0] = resList
+		# res[1] = labelList
 		# Initializing the list
 		if self.filterAssets.hasNode(baseAsset) and self.filterAssets.hasNode(quoteAsset):
 			exchangeList = DSALinkedList()
+			tradeList = DSALinkedList()
+			exchangeArray = np.empty(2, dtype=object)
+			exchangeArray[0] = tradeList
+			exchangeArray[1] = exchangeList
 			pathExchange = 0
 			labelList.insertLast(baseAsset)
 			# Calling the recursive function
-			resList = self._getExchange(labelList, exchangeList, pathExchange, quoteAsset)
-		# returning the list
-		return resList
+			res = self._getDetails(labelList, exchangeArray, pathExchange, quoteAsset)
+		# returning the results
+		return res
 	
 	# Clearing all the visited vertices
 	def clearAllVisited(self):

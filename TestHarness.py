@@ -37,7 +37,7 @@ exchange_data = json.load(exchangeFile)
 # for data in count:
 # 	print(data, count[data])
 
-for data in exchange_data['symbols'][:300]:
+for data in exchange_data['symbols']:
 	baseAsset = data['baseAsset']
 	quoteAsset = data['quoteAsset']
 	status = data['status']
@@ -48,7 +48,7 @@ for data in exchange_data['symbols'][:300]:
 	graph.addEdge(baseAsset, quoteAsset, status)
 print('Asset data has been loaded')
 
-for data in trade_data[:300]:
+for data in trade_data:
 	tradeName = data['symbol']
 	tradeEdge = graph.getTradeEdge(tradeName)
 	fromVertex = tradeEdge.getFromVertex()
@@ -121,16 +121,17 @@ baseAsset = input()
 print("Enter the quote asset")
 quoteAsset = input()
 # Getting the trade list
-tradeList = graph.getTradePaths(baseAsset, quoteAsset)
-exchangeList = graph.getTradeExchange(baseAsset, quoteAsset)
+# tradeList = graph.getTradePaths(baseAsset, quoteAsset)
+exchangeResults = graph.getTradeDetails(baseAsset, quoteAsset)
 # Displaying the trade paths if present, else displaying no trade paths
 # print('Best Position :', exchange[1])
-if tradeList.isEmpty():
+if exchangeResults[0].isEmpty():
 	print('\nNo Trade Paths\n')
 else:
 	print("\nTrade paths\n")
-	tradePath = tradeList.head
-	exchangePath = exchangeList.head
+	# tradePath = tradeList.head
+	tradePath = exchangeResults[0].head
+	exchangePath = exchangeResults[1].head
 	while(tradePath != None):
 		trade = tradePath.getValue().head
 		print("Path:", end=' ')
