@@ -125,10 +125,18 @@ quoteAsset = input()
 exchangeResults = graph.getTradeDetails(baseAsset, quoteAsset)
 # Displaying the trade paths if present, else displaying no trade paths
 # print('Best Position :', exchange[1])
-if exchangeResults[0].isEmpty():
+if exchangeResults.size == 0:
 	print('\nNo Trade Paths\n')
 else:
 	print("\nTrade paths\n")
+	bestPath = exchangeResults[2].head
+	print("Best Trade Path: ", end=' ')
+	while(bestPath != None):
+		print(bestPath.getValue(), end=' ')
+		bestPath = bestPath.getNext()
+	print()
+	print("Best Overall Exchange: ", exchangeResults[3])
+	print("\nAll the paths\n")
 	# tradePath = tradeList.head
 	tradePath = exchangeResults[0].head
 	exchangePath = exchangeResults[1].head

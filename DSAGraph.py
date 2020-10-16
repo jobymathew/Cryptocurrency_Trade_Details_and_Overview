@@ -459,35 +459,53 @@ class DSAGraph():
 						pathExchange += float(exchangeValue)
 						# exchangeList.insertLast(pathExchange)
 						exchangeArray[1].insertLast(pathExchange)
+						# Checking if it's the best exchange
+						if pathExchange > float(exchangeArray[3]):
+							exchangeArray[3] = pathExchange
+							exchangeArray[2] = copy.deepcopy(foundPath)
 					elif self.filterAssets.hasNode(val):
 						newVertex = self.getVertex(val)
 						# If the selected vertex is not visited, it is then added to the labels list and recursed for a new trade path
 						if not newVertex.getVisited():
-							# Adding the overall trade exchange
+							# Making a copy of the label list for recursive looping
 							newLabels = copy.deepcopy(labels)
+							# Inserting the current label
 							newLabels.insertLast(val)
-							# labels.insertLast(val)
+							# Getting the edge
 							edge = self.getEdge(label, val)
+							# Getting the price change value of the edge
 							exchangeValue = edge.getPriceChange()
-							pathExchange += float(exchangeValue)
-							exchangeArray = self._getDetails(newLabels, exchangeArray, pathExchange, quoteAsset)
+							# Making a copy of the path exchange for recursive looping
+							newPathExchange = copy.deepcopy(pathExchange)
+							# Adding the current value to the path exchange
+							newPathExchange += float(exchangeValue)
+							exchangeArray = self._getDetails(newLabels, exchangeArray, newPathExchange, quoteAsset)
 		return exchangeArray
 	
 	# Function to get the overall between two assets
 	def getTradeDetails(self, baseAsset, quoteAsset):
 		self.clearAllVisited()
-		resList = DSALinkedList()
-		labelList = DSALinkedList()
-		# res = np.empty(2, dtype=object)
-		# res[0] = resList
-		# res[1] = labelList
-		# Initializing the list
+		# Declaring an empty array
+		res = np.array([])
+		# Getting the details if the nodes are not ignored
 		if self.filterAssets.hasNode(baseAsset) and self.filterAssets.hasNode(quoteAsset):
+
 			exchangeList = DSALinkedList()
+			labelList = DSALinkedList()
 			tradeList = DSALinkedList()
-			exchangeArray = np.empty(2, dtype=object)
+			bestTrade = DSALinkedList()
+			edge = self.getEdge(baseAsset, quoteAsset)
+			if edge:
+				bestExchange = edge.getPriceChange()
+				bestTrade.insertLast(baseAsset)
+				bestTrade.insertLast(quoteAsset)
+			else:
+				bestExchange = -1000.0 
+			exchangeArray = np.empty(4, dtype=object)
 			exchangeArray[0] = tradeList
 			exchangeArray[1] = exchangeList
+			exchangeArray[2] = bestTrade
+			exchangeArray[3] = bestExchange
 			pathExchange = 0
 			labelList.insertLast(baseAsset)
 			# Calling the recursive function
