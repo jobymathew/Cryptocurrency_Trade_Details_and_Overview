@@ -2,21 +2,13 @@
 import sys
 import argparse
 import numpy as np
-# requests to get the data from the API
-import requests
 import pickle
 # importing copy to perform deep copy of classes
 import copy
 # Minh Dao - Tutor Sophie Lee-Goh
-# Using the Graph and LinkedList class which I made during the practicals - Modified to suite the assignment
+# Using the Graph class which I made during the practicals - Modified for the assignment
 from DSAGraph import DSAGraph
-from LinkedList import DSALinkedList
 import json
-
-# Getting the data from the API
-# tradeInfo = requests.get('https://www.binance.com/api/v3/ticker/24hr')
-# exchangeInfo = requests.get('https://www.binance.com/api/v3/exchangeInfo')
-# tokenTrades = requests.get('https://www.binance.com/api/v3/trades?symbol=ETHBTC')
 
 # Setting up the argument parser
 ap = argparse.ArgumentParser()
@@ -80,8 +72,10 @@ def getLoadOptions():
 		choice = int(input())
 		if choice == 1:
 			loadAssetData()
+			print('Asset data has been loaded')
 		elif choice == 2:
 			loadTradeData()
+			print('Trade data has been loaded')
 		elif choice == 3:
 			readFromSerializedFile()
 		elif choice == 4:
@@ -231,10 +225,8 @@ if args['interactive']:
 			getLoadOptions()
 		elif choice == 2:
 			displayAssetDetails()
-			print('Asset data has been loaded')
 		elif choice == 3:
 			displayTradeDetails()
-			print('Trade data has been loaded')
 		elif choice == 4:
 			displayTradePaths()
 		elif choice == 5:
@@ -269,10 +261,6 @@ elif args['report']:
 	print("\nTrade Overview")
 	graph.getTradeOverview()
 	
-
-	
-
-
 # Showing the usage information
 else:
 	ap.print_help(sys.stderr)

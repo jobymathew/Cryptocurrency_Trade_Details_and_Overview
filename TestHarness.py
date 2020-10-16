@@ -116,25 +116,31 @@ print('Trade data has been loaded')
 
 
 # getting the base asset and quote asset from the user
-# print("Enter the base asset")
-# baseAsset = input()
-# print("Enter the quote asset")
-# quoteAsset = input()
-# # Getting the trade list
-# tradeList = graph.getTradePaths(baseAsset, quoteAsset)
-# # Displaying the trade paths if present, else displaying no trade paths
-# if tradeList.isEmpty():
-# 	print('\nNo Trade Paths\n')
-# else:
-# 	print("\nTrade paths\n")
-# 	tradePath = tradeList.head
-# 	while(tradePath != None):
-# 		trade = tradePath.getValue().head
-# 		while(trade != None):
-# 			print(trade.getValue(), end=' ')
-# 			trade = trade.getNext()
-# 		print()
-# 		tradePath = tradePath.getNext()	
+print("Enter the base asset")
+baseAsset = input()
+print("Enter the quote asset")
+quoteAsset = input()
+# Getting the trade list
+tradeList = graph.getTradePaths(baseAsset, quoteAsset)
+exchangeList = graph.getTradeExchange(baseAsset, quoteAsset)
+# Displaying the trade paths if present, else displaying no trade paths
+# print('Best Position :', exchange[1])
+if tradeList.isEmpty():
+	print('\nNo Trade Paths\n')
+else:
+	print("\nTrade paths\n")
+	tradePath = tradeList.head
+	exchangePath = exchangeList.head
+	while(tradePath != None):
+		trade = tradePath.getValue().head
+		print("Path:", end=' ')
+		while(trade != None):
+			print(trade.getValue(), end=' ')
+			trade = trade.getNext()
+		print()
+		print('Exchange: ', exchangePath.getValue())
+		tradePath = tradePath.getNext()
+		exchangePath = exchangePath.getNext()	
 
 # choice = 0
 # # Getting the input from the user
@@ -160,8 +166,8 @@ print('Trade data has been loaded')
 # 	else:
 # 		print(f'{asset} already ignored from the graph')
 
-print('Asset Overview')
-graph.getAssetOverview()
+# print('Asset Overview')
+# graph.getAssetOverview()
 
 # print(graph.hasVertex(asset))
 
