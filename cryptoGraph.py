@@ -5,9 +5,12 @@ import numpy as np
 import pickle
 # importing copy to perform deep copy of classes
 import copy
+# importing csv to read the csv file
+import csv
 # Minh Dao - Tutor Sophie Lee-Goh
 # Using the Graph class which I made during the practicals - Modified for the assignment
 from DSAGraph import DSAGraph
+from Asset import AssetObject
 import json
 
 # Setting up the argument parser
@@ -22,6 +25,30 @@ args = vars(ap.parse_args())
 
 # Function to load the exchange data (asset data)
 def loadAssetData():
+	for i, row in enumerate(asset_data):
+		if i != 0 and i != 1:
+			circulatingSupply = None
+			if row[7] == '?':
+				circulatingSupply = '0'
+			else:
+				circulatingSupply = row[7]
+			volume = None
+			if row[8] == '$?':
+				volume = '0'
+			else:
+				volumeSplit = row[8][1:].strip().split(',')
+				volume = ''
+				for val in volumeSplit:
+					volume += val
+			if i < 10:
+				priceSplit = row[5][1:].strip().split(',')
+				price = ''
+				for val in priceSplit:
+					price += val
+			assets.addAsset(row[1].strip(), row[2].strip(), row[4].strip(), price, circulatingSupply.strip(), volume, row[9][:-1].strip(), row[10][:-1].strip(), row[11][:-1].strip())
+
+# Function to load the trade data
+def loadTradeData():
 	for data in exchange_data['symbols']:
 		baseAsset = data['baseAsset']
 		quoteAsset = data['quoteAsset']
@@ -31,9 +58,7 @@ def loadAssetData():
 		if not graph.hasVertex(quoteAsset):
 			graph.addVertex(quoteAsset, 0)
 		graph.addEdge(baseAsset, quoteAsset, status)
-
-# Function to load the trade data
-def loadTradeData():
+	
 	for data in trade_data:
 		tradeName = data['symbol']
 		tradeEdge = graph.getTradeEdge(tradeName)
@@ -114,21 +139,16 @@ def displayTradeDetails():
 def displayAssetDetails():
 	print("Input the asset name")
 	assetName = input()
-	if graph.hasVertex(assetName):
-		vertex = graph.getVertex(assetName)
-		if (vertex.getTotalPriceChange() == 0):
-			print('No data as there is no trading')
-		else:
-			print('\n24H Total Weighted Average Price :', vertex.getTotalWeightedAvgPrice())
-			print('24H Average Weighted Average Price :', vertex.getAverageWeightedAvgPrice())
-			print('24H Total Price Change :', vertex.getTotalPriceChange())
-			print('24H Average Price Change :', vertex.getAveragePriceChange())
-			print('24H Average Price Percent Change : ', vertex.getAveragePriceChangePercent())
-			print('24H Total Volume traded :', vertex.getTotalVolume())
-			print('24H Average Volume traded :', vertex.getAverageVolume())
-			print('24H Total Count traded :', vertex.getTotalCount())
-			print('24H Average Count traded :', vertex.getAverageCount())
-			print()
+	if assets.hasAsset(assetName):
+		asset = assets.getAsset(assetName)
+		print('Name:', asset.getName())
+		print('Market Cap:', asset.getMarketCap())
+		print('Price:', asset.getPrice())
+		print('Circulating Supply:', asset.getCirculatingSupply())
+		print('Volume:', asset.getVolume())
+		print('One Hour Percent:'+asset.getOneHourPercent()+'%')
+		print('Twenty Four Hour Percent:'+asset.getTwentyFourHourPercent()+'%')
+		print('Seven Day Percent:'+asset.getSevenDayPercent()+'%')
 	else:
 		print("\nAsset doesn't exist\n")
 
@@ -209,8 +229,13 @@ if args['interactive']:
 
 	# declaring the graph object
 	graph = DSAGraph()
+	# declaring the asset object
+	assets = AssetObject()
 
-	# Converting to json
+	asset_file =  open('asset_info.csv') 
+	# Reading the csv
+	asset_data = csv.reader(asset_file)
+	# Reading trade files and converting to json
 	tradeFile = open('trade_file.json')
 	exchangeFile = open('asset_file.json')
 	trade_data = json.load(tradeFile)
@@ -232,7 +257,7 @@ if args['interactive']:
 		elif choice == 5:
 			assetFilter()
 		elif choice == 6:
-			graph.getAssetOverview()
+			assets.getAssetOverview()
 		elif choice == 7:
 			graph.getTradeOverview()
 		elif choice == 8:

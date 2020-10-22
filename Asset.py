@@ -1,5 +1,6 @@
 
 import numpy as np
+from LinkedList import DSALinkedList
 
 class Asset():
 
@@ -7,10 +8,10 @@ class Asset():
 	def __init__(self, inName, inLabel, inMarketCap, inPrice, inCirculatingSupply, inVolume, inOneHourPercent, inTwentyFourHourPercent, inSevenDayPercent):
 		self.name = inName
 		self.label = inLabel
-		self.marketCap = inMarketCap
-		self.price = inPrice
-		self.circulatingSupply = inCirculatingSupply
-		self.volume = inVolume
+		self.marketCap = float(inMarketCap)
+		self.price = float(inPrice)
+		self.circulatingSupply = float(inCirculatingSupply)
+		self.volume = float(inVolume)
 		self.oneHourPercent = inOneHourPercent
 		self.twentyFourHourPercent = inTwentyFourHourPercent
 		self.sevenDayPercent = inSevenDayPercent
@@ -29,25 +30,25 @@ class Asset():
 		return self.label
 	
 	def setMarketCap(self, inMarketCap):
-		self.marketCap = inMarketCap
+		self.marketCap = float(inMarketCap)
 	
 	def getMarketCap(self):
 		return self.marketCap
 	
 	def setPrice(self, inPrice):
-		self.price = inPrice
+		self.price = float(inPrice)
 	
 	def getPrice(self):
 		return self.price
 	
 	def setCirculatingSupply(self, inCirculatingSupply):
-		self.circulatingSupply = inCirculatingSupply
+		self.circulatingSupply = float(inCirculatingSupply)
 	
 	def getCirculatingSupply(self):
 		return self.circulatingSupply
 	
 	def setVolume(self, inVolume):
-		self.volume = inVolume
+		self.volume = float(inVolume)
 	
 	def getVolume(self):
 		return self.volume
@@ -71,7 +72,7 @@ class Asset():
 		return self.sevenDayPercent
 	
 
-class assetObject():
+class AssetObject():
 
 	# initializing the constructor
 	def __init__(self):
@@ -80,25 +81,29 @@ class assetObject():
 	# Adding an asset
 	def addAsset(self, inName, inLabel, inMarketCap, inPrice, inCirculatingSupply, inVolume, inOneHourPercent, inTwentyFourHourPercent, inSevenDayPercent):
 		newAsset = Asset(inName, inLabel, inMarketCap, inPrice, inCirculatingSupply, inVolume, inOneHourPercent, inTwentyFourHourPercent, inSevenDayPercent)
-		assetList.insertLast(newAsset)
+		self.assetList.insertLast(newAsset)
 	
 	# returning an asset
 	def getAsset(self, inLabel):
 		retAsset = None
 		currAsset = self.assetList.head
 		isFound = False
-		if not currAsset.isEmpty():
-			while(currAsset.getValue() != None and not isFound):
+		if not self.assetList.isEmpty():
+			while(currAsset != None and not isFound):
 				if currAsset.getValue().getLabel() == inLabel:
 					retAsset = currAsset.getValue()
 					isFound = True 
 				currAsset = currAsset.getNext()
 		return retAsset
 	
+	# returning an asset
+	def hasAsset(self, inLabel):
+		return self.getAsset(inLabel) != None
+	
 
 	def getAssetOverview(self):
 		# Getting the list of assets
-		assets = self.assetList.listOfVertices()
+		assets = self.assetList.listOfValues()
 		# initializing the arrays
 		highestMarketCap = np.empty(10, dtype=object)
 		highestMarketCapLabels = np.empty(10, dtype=object)
@@ -108,12 +113,6 @@ class assetObject():
 		highestCirculatingSupplyLabels = np.empty(10, dtype=object)
 		highestVolume = np.empty(10, dtype=object)
 		highestVolumeLabels = np.empty(10, dtype=object)
-		highestOneHourPercent = np.empty(10, dtype=object)
-		highestOneHourPercentLabels = np.empty(10, dtype=object)
-		highestTwentyFourHourPercent = np.empty(10, dtype=object)
-		highestTwentyFourHourPercentLabels = np.empty(10, dtype=object)
-		highestSevenDayPercent = np.empty(10, dtype=object)
-		highestSevenDayPercentLabels = np.empty(10, dtype=object)
 
 		for asset in assets:
 			label = asset.getLabel()
@@ -121,25 +120,16 @@ class assetObject():
 			self.insertHighValue(label, asset.getPrice(), highestPrice, highestPriceLabels)
 			self.insertHighValue(label, asset.getCirculatingSupply(), highestCirculatingSupply, highestCirculatingSupplyLabels)
 			self.insertHighValue(label, asset.getVolume(), highestVolume, highestVolumeLabels)
-			self.insertHighValue(label, asset.getOneHourPercent(), highestOneHourPercent, highestOneHourPercentLabels)
-			self.insertHighValue(label, asset.getTwentyFourHourPercent(), highestTwentyFourHourPercent, highestTwentyFourHourPercentLabels)
-			self.insertHighValue(label, asset.getSevenDayPercent(), highestSevenDayPercent, highestSevenDayPercentLabels)
 		
 		# Printing out the top 10 values
-		print('\nTop 10 Market Caps')
+		print('\nTop 10 Market Caps\n')
 		self.displayOverview(highestMarketCapLabels, highestMarketCap)
-		print('\nTop 10 Price')
+		print('\nTop 10 Price\n')
 		self.displayOverview(highestPriceLabels, highestPrice)
-		print('\nTop 10 Circulating Supply')
+		print('\nTop 10 Circulating Supply\n')
 		self.displayOverview(highestCirculatingSupplyLabels, highestCirculatingSupply)
-		print('\nTop 10 Total Volume')
+		print('\nTop 10 Total Volume\n')
 		self.displayOverview(highestVolumeLabels, highestVolume)
-		print('\nTop 10 1 Hour percent change')
-		self.displayOverview(highestOneHourPercentLabels, highestOneHourPercent)
-		print('\nTop 10 24 Hour percent change')
-		self.displayOverview(highestTwentyFourHourPercentLabels, highestTwentyFourHourPercent)
-		print('\nTop 10 7 Day percent change')
-		self.displayOverview(highestSevenDayPercentLabels, highestSevenDayPercent)
 
 	
 	# Shifting down values in the given array 
