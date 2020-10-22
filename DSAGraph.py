@@ -369,7 +369,7 @@ class DSAGraph():
 	def ignoreAsset(self, inAsset):
 		self.filterAssets.remove(inAsset);
 	
-	# readd the given asset
+	# re-add the given asset
 	def addAsset(self, inAsset):
 		self.filterAssets.insertLast(inAsset);
 	
@@ -486,7 +486,7 @@ class DSAGraph():
 	def getTradeDetails(self, baseAsset, quoteAsset):
 		self.clearAllVisited()
 		# Declaring an empty array
-		res = np.array([])
+		resultArray = np.array([])
 		# Getting the details if the nodes are not ignored
 		if self.filterAssets.hasNode(baseAsset) and self.filterAssets.hasNode(quoteAsset):
 			# List storing the overall exchange values of each trade
@@ -516,7 +516,7 @@ class DSAGraph():
 			# Calling the recursive function
 			resultArray = self._getDetails(labelList, exchangeArray, pathExchange, quoteAsset)
 		# returning the results
-		return resultAray
+		return resultArray
 	
 	# Clearing all the visited vertices
 	def clearAllVisited(self):

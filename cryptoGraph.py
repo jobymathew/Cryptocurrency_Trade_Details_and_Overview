@@ -160,20 +160,32 @@ def displayTradePaths():
 	print("Enter the quote asset")
 	quoteAsset = input()
 	# Getting the trade list
-	tradeList = graph.getTradePaths(baseAsset, quoteAsset)
+	exchangeResults = graph.getTradeDetails(baseAsset, quoteAsset)
 	# Displaying the trade paths if present, else displaying no trade paths
-	if tradeList.isEmpty():
+	if exchangeResults.size == 0:
 		print('\nNo Trade Paths\n')
 	else:
 		print("\nTrade paths\n")
-		tradePath = tradeList.head
+		bestPath = exchangeResults[2].head
+		print("Best Trade Path: ", end=' ')
+		while(bestPath != None):
+			print(bestPath.getValue(), end=' ')
+			bestPath = bestPath.getNext()
+		print()
+		print("Best Overall Exchange: ", exchangeResults[3])
+		print("\nAll the paths\n")
+		tradePath = exchangeResults[0].head
+		exchangePath = exchangeResults[1].head
 		while(tradePath != None):
 			trade = tradePath.getValue().head
+			print("Path:", end=' ')
 			while(trade != None):
 				print(trade.getValue(), end=' ')
 				trade = trade.getNext()
 			print()
+			print('Exchange: ', exchangePath.getValue())
 			tradePath = tradePath.getNext()
+			exchangePath = exchangePath.getNext()
 
 # Function to read from serialized file
 def readFromSerializedFile():
@@ -191,7 +203,7 @@ def writeToSerializedFile():
 	try:
 		# Writing in the serialized file
 		with open('serializedCrytoGraph.txt', 'wb') as dataFile:
-			pickle.dump(filterGraph, dataFile)
+			pickle.dump(graph, dataFile)
 			print('Graph has been written into the serialized file')
 	except:
 		print("Error: problem pickling object!")
@@ -213,11 +225,13 @@ def assetFilter():
 			print(f'{asset} already present in the graph')
 		else:
 			graph.addAsset(asset)
+			assets.addBackAsset(asset)
 			print(f'{asset} has been included in the graph')
 	else:
 		# ignoring the asset and its edges if it is present in the graph
 		if graph.hasVertex(asset):
 			graph.ignoreAsset(asset)
+			assets.ignoreAsset(asset)
 			print(f'{asset} has been ignored from the graph')
 		else:
 			print(f'{asset} already ignored from the graph')
@@ -273,8 +287,13 @@ elif args['report']:
 
 	# declaring the graph object
 	graph = DSAGraph()
+	# declaring the assets object
+	assets = AssetObject()
 
-	# Converting to json
+	asset_file =  open('asset_info.csv') 
+	# Reading the csv
+	asset_data = csv.reader(asset_file)
+	# reading the file and converting to json
 	tradeFile = open(args['report'][1])
 	exchangeFile = open(args['report'][0])
 	trade_data = json.load(tradeFile)
@@ -282,7 +301,7 @@ elif args['report']:
 	loadAssetData()
 	loadTradeData()
 	print("\nAsset Overview")
-	graph.getAssetOverview()
+	assets.getAssetOverview()
 	print("\nTrade Overview")
 	graph.getTradeOverview()
 	
