@@ -489,11 +489,15 @@ class DSAGraph():
 		res = np.array([])
 		# Getting the details if the nodes are not ignored
 		if self.filterAssets.hasNode(baseAsset) and self.filterAssets.hasNode(quoteAsset):
-
+			# List storing the overall exchange values of each trade
 			exchangeList = DSALinkedList()
+			# List of labels
 			labelList = DSALinkedList()
+			# List storing the various trade paths
 			tradeList = DSALinkedList()
+			# List storing the best trade path
 			bestTrade = DSALinkedList()
+			# Initializing the best trade and best exchange
 			edge = self.getEdge(baseAsset, quoteAsset)
 			if edge:
 				bestExchange = edge.getPriceChange()
@@ -501,6 +505,7 @@ class DSAGraph():
 				bestTrade.insertLast(quoteAsset)
 			else:
 				bestExchange = -1000.0 
+			# Array storing the required inputs 
 			exchangeArray = np.empty(4, dtype=object)
 			exchangeArray[0] = tradeList
 			exchangeArray[1] = exchangeList
@@ -509,9 +514,9 @@ class DSAGraph():
 			pathExchange = 0
 			labelList.insertLast(baseAsset)
 			# Calling the recursive function
-			res = self._getDetails(labelList, exchangeArray, pathExchange, quoteAsset)
+			resultArray = self._getDetails(labelList, exchangeArray, pathExchange, quoteAsset)
 		# returning the results
-		return res
+		return resultAray
 	
 	# Clearing all the visited vertices
 	def clearAllVisited(self):
