@@ -129,90 +129,10 @@ class DSAGraphNode():
 		self.value = inValue
 		self.adjacents = DSALinkedList()
 		self.visited = False
-		self.priceChange = DSALinkedList()
-		self.totalPriceChange = 0
-		self.priceChangePercent = DSALinkedList()
-		self.totalPriceChangePercent = 0
-		self.volume = DSALinkedList()
-		self.totalVolume = 0
-		self.count = DSALinkedList()
-		self.totalCount = 0
-		self.weightedAvgPrice = DSALinkedList()
-		self.totalWeightedAvgPrice = 0
 	
 	# Returning the list of adjacents
 	def getAdjacents(self):
 		return self.adjacents
-	
-	# Adding the price change to the list
-	def addPriceChange(self, inPriceChange):
-		self.priceChange.insertLast(inPriceChange)
-		self.totalPriceChange += float(inPriceChange)
-	
-	# Getting the total price change 
-	def getTotalPriceChange(self):
-		return self.totalPriceChange
-	
-	# Getting the average price change
-	def getAveragePriceChange(self):
-		countOfItems = self.priceChange.count()
-		return self.totalPriceChange/countOfItems
-
-	# Adding the price change percent to the list
-	def addPriceChangePercent(self, inPriceChangePercent):
-		self.priceChangePercent.insertLast(inPriceChangePercent)
-		self.totalPriceChangePercent += float(inPriceChangePercent)
-	
-	# Getting the total price change 
-	def getTotalPriceChangePercent(self):
-		return self.totalPriceChangePercent
-	
-	# Getting the average price change precent
-	def getAveragePriceChangePercent(self):
-		countOfItems = self.priceChangePercent.count()
-		return self.totalPriceChangePercent/countOfItems
-	
-	# Adding the volume to the list
-	def addVolume(self, inVolume):
-		self.volume.insertLast(inVolume)
-		self.totalVolume += float(inVolume)
-
-	# Getting the total volume
-	def getTotalVolume(self):
-		return self.totalVolume
-	
-	# Getting the average volume
-	def getAverageVolume(self):
-		countOfItems = self.volume.count()
-		return self.totalVolume/countOfItems
-
-	# Adding the count to the list
-	def addCount(self, inCount):
-		self.count.insertLast(inCount)
-		self.totalCount += int(inCount)
-	
-	# Getting the total count
-	def getTotalCount(self):
-		return self.totalCount
-	
-	# Getting the average count
-	def getAverageCount(self):
-		countOfItems = self.count.count()
-		return int(self.totalCount/countOfItems)
-	
-	# Adding the weighted average price to the list
-	def addWeightedAvgPrice(self, inWeightedAvgPrice):
-		self.weightedAvgPrice.insertLast(inWeightedAvgPrice)
-		self.totalWeightedAvgPrice += float(inWeightedAvgPrice)
-	
-	# Getting the total weightedAvgPrice
-	def getTotalWeightedAvgPrice(self):
-		return self.totalWeightedAvgPrice
-	
-	# Getting the average weightedAvgPrice
-	def getAverageWeightedAvgPrice(self):
-		countOfItems = self.weightedAvgPrice.count()
-		return float(self.totalWeightedAvgPrice/countOfItems)
 
 	# Returning the label of the graph node
 	def getLabel(self):
@@ -292,10 +212,7 @@ class DSAGraph():
 	def addEdge(self, label1, label2, status):
 		vertex1 = self.findVertex(label1)
 		vertex2 = self.findVertex(label2)
-		# if not vertex1.hasAdjacent(label2):
 		vertex1.addAdjacent(label2)
-		# vertex2.addEdge(label1)
-		# edge = (label1, label2)
 		edge = DSAGraphEdge(vertex1, vertex2, status)
 		self.edges.insertLast(edge)
 
@@ -380,60 +297,6 @@ class DSAGraph():
 		if edge and edge.getStatus() == 'TRADING':
 			trading = True
 		return trading
-	
-	# Function to find the trade path between the given assets - Note that this is a modified DFS 
-	def _getPaths(self, labels, tradeList, exchangeList, pathExchange, quoteAsset):
-		# Getting the last value from the labels list
-		label = labels.peekLast()
-		vertex = self.getVertex(label)
-		# Marking the vertex as visited
-		vertex.setVisited()
-		adjData = self.getAdjacent(label) 
-		# Checking if the adjacent list is not none and the trade path is not break            
-		if adjData.size != 0 or self.isTrading(label+quoteAsset):
-				for i, val in enumerate(adjData):
-					if val == quoteAsset:
-						# adding the quote asset to the path and appending to the trade list
-						foundPath = copy.deepcopy(labels)
-						foundPath.insertLast(quoteAsset)
-						tradeList.insertLast(foundPath)
-						# remove the quote asset from the list
-						adjData = np.delete(adjData, i)
-						# Adding the overall trade exchange
-						# edge = self.getEdge(label, quoteAsset)
-						# exchangeValue = edge.getPriceChange()
-						# pathExchange += float(exchangeValue)
-						# exchangeList.insertLast(pathExchange)
-					elif self.filterAssets.hasNode(val):
-						newVertex = self.getVertex(val)
-						# If the selected vertex is not visited, it is then added to the labels list and recursed for a new trade path
-						if not newVertex.getVisited():
-							newLabels = copy.deepcopy(labels)
-							newLabels.insertLast(val)
-							# Adding the overall trade exchange
-							# edge = self.getEdge(label, val)
-							# exchangeValue = edge.getPriceChange()
-							# pathExchange += float(exchangeValue)
-							tradeList = self._getPaths(newLabels, tradeList, exchangeList, pathExchange, quoteAsset)
-		return tradeList
-	
-	# Function to get the indirect trade path between two assets
-	def getTradePaths(self, baseAsset, quoteAsset):
-		self.clearAllVisited()
-		resList = DSALinkedList()
-		overallExchangeList = DSALinkedList()
-		# Initializing the list
-		if self.filterAssets.hasNode(baseAsset) and self.filterAssets.hasNode(quoteAsset):
-			tradeList = DSALinkedList()
-			labelList = DSALinkedList()
-			exchangeList = DSALinkedList()
-			pathExchange = 0
-			labelList.insertLast(baseAsset)
-			# Calling the recursive function
-			resList = self._getPaths(labelList, tradeList, exchangeList, pathExchange, quoteAsset)
-		# returning the list
-		return resList
-	
 	
 	# Function to find the exchange between the given assets - Note that this is a modified DFS 
 	def _getDetails(self, labels, exchangeArray, pathExchange, quoteAsset):
@@ -615,43 +478,7 @@ class DSAGraph():
 	# Getting the first vertex of the graph
 	def getFirstVertex(self):
 		return self.vertices.peekFirst()
-	
-	def getAssetOverview(self):
-		# Getting the list of vertices
-		vertices = self.listOfVertices()
-		highestTotalWeightedAvgPrice = np.empty(10, dtype=object)
-		highestTotalWeightedAvgPriceLabels = np.empty(10, dtype=object)
-		highestTotalPriceChange = np.empty(10, dtype=object)
-		highestTotalPriceChangeLabels = np.empty(10, dtype=object)
-		highestTotalPriceChangePercent = np.empty(10, dtype=object)
-		highestTotalPriceChangePercentLabels = np.empty(10, dtype=object)
-		highestTotalVolume = np.empty(10, dtype=object)
-		highestTotalVolumeLabels = np.empty(10, dtype=object)
-		highestTotalCount = np.empty(10, dtype=object)
-		highestTotalCountLabels = np.empty(10, dtype=object)
 
-		for vertex in vertices:
-			label = vertex.getLabel()
-			if self.filterAssets.hasNode(label):
-				self.insertHighValue(label, vertex.totalWeightedAvgPrice, highestTotalWeightedAvgPrice, highestTotalWeightedAvgPriceLabels)
-				self.insertHighValue(label, vertex.totalPriceChange, highestTotalPriceChange, highestTotalPriceChangeLabels)
-				self.insertHighValue(label, vertex.totalPriceChangePercent, highestTotalPriceChangePercent, highestTotalPriceChangePercentLabels)
-				self.insertHighValue(label, vertex.totalVolume, highestTotalVolume, highestTotalVolumeLabels)
-				self.insertHighValue(label, vertex.totalCount, highestTotalCount, highestTotalCountLabels)
-		
-		# Printing out the top 10 values
-		print('\nTop 10 Total Weighted Average Labels')
-		self.displayOverview(highestTotalWeightedAvgPriceLabels, highestTotalWeightedAvgPrice)
-		print('\nTop 10 Total Price Change')
-		self.displayOverview(highestTotalPriceChangeLabels, highestTotalPriceChange)
-		print('\nTop 10 Total Price Change Precent')
-		self.displayOverview(highestTotalPriceChangePercentLabels, highestTotalPriceChangePercent)
-		print('\nTop 10 Total Volume')
-		self.displayOverview(highestTotalVolumeLabels, highestTotalVolume)
-		print('\nTop 10 Total Count')
-		self.displayOverview(highestTotalCountLabels, highestTotalCount)
-
-	
 	# Shifting down values in the given array 
 	def shiftDown(self, position, highValues, highLabels):
 		for i in range(position+1, highValues.size):
@@ -678,12 +505,12 @@ class DSAGraph():
 		for i in range(labels.size):
 			print(f'{i+1}. {labels[i]} - {values[i]}')
 		print()
-
 					
 	# Finding the Trade overview details
 	def getTradeOverview(self):
 		# Getting the list of edges
 		edgeList = self.listOfEdges()
+		# Initializing empty arrays for storing the top 10 values
 		highestPriceChange = np.empty(10, dtype=object)
 		highestPriceChangeLabels = np.empty(10, dtype=object)
 		highestPriceChangePercent = np.empty(10, dtype=object)
@@ -706,6 +533,7 @@ class DSAGraph():
 			label = edge.getEdgeLabel()
 			fromVertex = edge.getFromVertex().getLabel()
 			toVertex = edge.getToVertex().getLabel()
+			# Inserting the highest values if it is not ignored
 			if self.filterAssets.hasNode(fromVertex) and self.filterAssets.hasNode(toVertex):
 				self.insertHighValue(label, edge.priceChange, highestPriceChange, highestPriceChangeLabels)
 				self.insertHighValue(label, edge.priceChangePercent, highestPriceChangePercent, highestPriceChangePercentLabels)
@@ -736,70 +564,3 @@ class DSAGraph():
 		print('\nTop 10 Count');
 		self.displayOverview(highestCountLabels, highestCount)
 
-
-if __name__ == '__main__':
-	print("------------Graphs-----------\n")
-	# Initializing the graph
-	graph = DSAGraph()
-
-	# Inserting into the graph vertices
-	graph.addVertex('A',12)
-	graph.addVertex('B',13)
-	graph.addVertex('C',25)
-	graph.addVertex('D',65)
-	graph.addVertex('E',17)
-	graph.addVertex('F',39)
-	graph.addVertex('G',24)
-
-	# Inserting the edges into the graph
-	graph.addEdge('A','B', 12, 3)
-	graph.addEdge('A','C', 14, 5)
-	graph.addEdge('A','D', 16, 2)
-	graph.addEdge('A','E', 21, 44)
-	graph.addEdge('B','E', 45, 12)
-	graph.addEdge('D','F', 3, 3)
-	graph.addEdge('C','D', 23, 67)
-	graph.addEdge('E','F', 12, 45)
-	graph.addEdge('E','G', 12, 89)
-	graph.addEdge('F','G', 86, 27)
-
-	# Displaying the graph
-	graph.display()
-
-	# Finding the adjacent of a vertex
-	adjancetA = graph.getAdjacent('A')
-	print('Adjancent vertices of A')
-	print(adjancetA)
-
-	# Finding the adjacent edges of the vertex
-	print('Adjacent Edges of A')
-	adjacentEdgesA = graph.getAdjacentE('A')
-	print(adjacentEdgesA)
-
-
-	# Checking if adjacent
-	print(graph.isAdjacent('E','G'))
-
-	# Finding the edge and vertex count of the graph
-	vertexCount = graph.getVertexCount()
-	edgeCount = graph.getEdgeCount()
-	print(vertexCount)
-	print(edgeCount)
-
-	# Checking if a vertex is present
-	print(graph.hasVertex('E'))
-
-	# # DFS
-	# print('\nDepth First Search\n')
-	# dfs = graph.depthFirstSearch()
-	# print(dfs)
-
-	# # Clearing visited in the vertices
-	# for val in graph.listOfVertices():
-	# 	vertex = graph.findVertex(val)
-	# 	vertex.clearVisited()
-
-	# BFS
-	print('\nBreadth First Search\n')
-	dfs = graph.breadthFirstSearch()
-	print(dfs)

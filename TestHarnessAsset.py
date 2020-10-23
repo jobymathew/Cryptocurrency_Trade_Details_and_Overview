@@ -69,3 +69,17 @@ print('\n Asset Report \n')
 
 assets.getAssetOverview()
 
+# Ignore asset
+
+print('Ignoring BTC')
+assets.ignoreAsset('BTC')
+
+print('BTC exists: ', assets.hasAsset('BTC'))
+
+# Asset Report
+
+print('\n Asset Report \n')
+
+assets.getAssetOverview()
+
+

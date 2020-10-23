@@ -1,27 +1,28 @@
-# sys and argparse to implement argument parsing
-import sys
-import argparse
 import numpy as np
-import pickle
-# importing copy to perform deep copy of classes
-import copy
-# importing csv to read the csv file
-import csv
 # Minh Dao - Tutor Sophie Lee-Goh
-# Using the Graph class which I made during the practicals - Modified for the assignment
+# Using the Graph class which I made during the practicals
 from DSAGraph import DSAGraph
 from Asset import AssetObject
 import json
+import pickle
+import csv
 
-# Setting up the argument parser
-ap = argparse.ArgumentParser()
-# Adding the argument for interactive test enviornment
-ap.add_argument("-i", "--interactive", help='interactive testing enviornment', action='store_true')
-# Adding the argument for report mode
-ap.add_argument("-r", "--report", nargs='+', help='report mode')
+# Declaring the objects
+graph = DSAGraph()
+assets = AssetObject()
 
-# Getting the argument variables
-args = vars(ap.parse_args())
+# Reading the files
+asset_file =  open('asset_info.csv') 
+# Reading the csv
+asset_data = csv.reader(asset_file)
+# Reading trade files and converting to json
+tradeFile = open('trade_file.json')
+exchangeFile = open('asset_file.json')
+trade_data = json.load(tradeFile)
+exchange_data = json.load(exchangeFile)
+
+
+# All the functions in the cryptoGraph are declared here for testing. I am not able to import it from the cryptoGraph file because of writing the argument parser.
 
 # Function to load the exchange data (asset data)
 def loadAssetData():
@@ -62,11 +63,18 @@ def loadTradeData():
 	for data in trade_data:
 		tradeName = data['symbol']
 		tradeEdge = graph.getTradeEdge(tradeName)
+		# fromVertex = tradeEdge.getFromVertex()
 		priceChange = data['priceChange']
 		priceChangePercent = data['priceChangePercent']
 		volume = data['volume']
 		count = data['count']
 		weightedAvgPrice = data['weightedAvgPrice']
+		# Adding data to the node class
+		# fromVertex.addVolume(volume)
+		# fromVertex.addPriceChangePercent(priceChangePercent)
+		# fromVertex.addPriceChange(priceChange)
+		# fromVertex.addCount(count)
+		# fromVertex.addWeightedAvgPrice(weightedAvgPrice)
 		quoteVolume = data['quoteVolume']
 		lowPrice = data['lowPrice']
 		highPrice = data['highPrice']
@@ -102,10 +110,12 @@ def getLoadOptions():
 			print('Wrong input, please try again\n')
 
 # Function to display details related to the trade
-def displayTradeDetails():
+# This function has been modified for the test harness, the real function is in comments
+# def displayTradeDetails():
+def displayTradeDetails(tradeName):
 	# Getting the input from the user
-	print("Input the trade name")
-	tradeName = input()
+	# print("Input the trade name")
+	# tradeName = input()
 	# Checking if trade edge exists
 	if graph.hasTradeEdge(tradeName):
 		graphEdge = graph.getTradeEdge(tradeName)
@@ -114,7 +124,7 @@ def displayTradeDetails():
 		quoteAsset = graphEdge.getToVertex()
 		# Displaying the trade details
 		print(f'\n{tradeName}')
-		print('\nStatus :', graphEdge.getStatus())
+		print('Status :', graphEdge.getStatus())
 		if graphEdge.getStatus() == 'TRADING':
 			print('24H Price :', graphEdge.getWeightedAvgPrice())
 			print(f'24H Price Change :', graphEdge.getPriceChange())
@@ -127,12 +137,14 @@ def displayTradeDetails():
 		else:
 			print('No data as there is no trading')
 	else:
-		print("Trade doesn't exist")
+		print(f"{tradeName} doesn't exist")
 
 # Function to display the details related to the asset
-def displayAssetDetails():
-	print("Input the asset name")
-	assetName = input()
+# This function has been modified for the test harness, the real function is in comments
+# def displayAssetDetails():
+def displayAssetDetails(assetName):
+	# print("Input the asset name")
+	# assetName = input()
 	if assets.hasAsset(assetName):
 		asset = assets.getAsset(assetName)
 		print(f'\n{assetName}')
@@ -145,22 +157,23 @@ def displayAssetDetails():
 		print('Twenty Four Hour Percent:'+asset.getTwentyFourHourPercent()+'%')
 		print('Seven Day Percent:'+asset.getSevenDayPercent()+'%')
 	else:
-		print("\nAsset doesn't exist\n")
+		print(f"\n{assetName} doesn't exist\n")
 
 # Function to compute and display the trade paths 
-def displayTradePaths():
+# This function has been modified for the test harness, the real function is in comments
+# def displayTradePaths():
+def displayTradePaths(baseAsset, quoteAsset):
 	# getting the base asset and quote asset from the user
-	print("Enter the base asset")
-	baseAsset = input()
-	print("Enter the quote asset")
-	quoteAsset = input()
+	# print("Enter the base asset")
+	# baseAsset = input()
+	# print("Enter the quote asset")
+	# quoteAsset = input()
 	# Getting the trade list
 	exchangeResults = graph.getTradeDetails(baseAsset, quoteAsset)
 	# Displaying the trade paths if present, else displaying no trade paths
 	if exchangeResults.size == 0:
 		print('\nNo Trade Paths\n')
 	else:
-		print("\nTrade paths\n")
 		bestPath = exchangeResults[2].head
 		print("Best Trade Path: ", end=' ')
 		while(bestPath != None):
@@ -204,16 +217,18 @@ def writeToSerializedFile():
 		print("Error: problem pickling object!")
 
 # Function to filter an asset
-def assetFilter():
-	choice = 0
-	# Getting the input from the user
-	print('\nEnter 1 for including an asset and 2 for ignoring an asset')
-	while(choice != 1 and choice != 2):
-		choice = int(input())
-		if choice!= 1 and choice!= 2:
-			print('Wrong input, please try again\n')
-	print('Enter the asset name')
-	asset = input()
+# Function modified for testing
+# def assetFilter():
+def assetFilter(asset, choice):
+	# choice = 0
+	# # Getting the input from the user
+	# print('\nEnter 1 for including an asset and 2 for ignoring an asset')
+	# while(choice != 1 and choice != 2):
+	# 	choice = int(input())
+	# 	if choice!= 1 and choice!= 2:
+	# 		print('Wrong input, please try again\n')
+	# print('Enter the asset name')
+	# asset = input()
 	if choice == 1:
 		# checking if the asset is already present, else adding it back
 		if graph.hasVertex(asset):
@@ -233,75 +248,101 @@ def assetFilter():
 
 
 
-# Entering the interactive mode
-if args['interactive']:
+# Test Harness for all the functions
 
-	# declaring the graph object
-	graph = DSAGraph()
-	# declaring the asset object
-	assets = AssetObject()
+# Loading the asset data
+print('\nLoading the Asset data')
+loadAssetData()
 
-	asset_file =  open('asset_info.csv') 
-	# Reading the csv
-	asset_data = csv.reader(asset_file)
-	# Reading trade files and converting to json
-	tradeFile = open('trade_file.json')
-	exchangeFile = open('asset_file.json')
-	trade_data = json.load(tradeFile)
-	exchange_data = json.load(exchangeFile)
+# Loading the trade data
+print('\nLoading the Trade data')
+loadTradeData()
 
-	# selecting the choice from the menu driven options
-	choice = 0
-	while(choice != 9):
-		print('\n----------Trade Menu----------\n(1) Load Data\n\t-Asset data\n\t-Trade data\n\t-Serialised Data\n(2) Find and display asset\n(3) Find and display trade details\n(4) Find and display potential trade paths\n(5) Set asset filter\n(6) Asset overview\n(7) Trade overview\n(8) Save data (serialised)\n(9) Exit')
-		choice = int(input())
-		if choice == 1:
-			getLoadOptions()
-		elif choice == 2:
-			displayAssetDetails()
-		elif choice == 3:
-			displayTradeDetails()
-		elif choice == 4:
-			displayTradePaths()
-		elif choice == 5:
-			assetFilter()
-		elif choice == 6:
-			assets.getAssetOverview()
-		elif choice == 7:
-			graph.getTradeOverview()
-		elif choice == 8:
-			writeToSerializedFile()
-		elif choice == 9:
-			print('Goodbye')
-		else:
-			print('\nInvalid choice, please try again')
-			
+# Find asset details
+print('\nChecking if asset exist and printing its details')
+for label in ['BTC', 'BNB', 'USDT', 'PAX']:
+	displayAssetDetails(label)
 
-# Entering the report mode
-elif args['report']:
+# Find Trade details
+print('\nChecking if trade exists and prints its details')
+for label in ['BTCUSDT', 'BNBBTC', 'ETHBTC']:
+	displayTradeDetails(label)
 
-	# declaring the graph object
-	graph = DSAGraph()
-	# declaring the assets object
-	assets = AssetObject()
+# Displayiing trade paths
+base = ['BTC', 'BNB', 'BCC', 'ETH']
+quote = ['USDT', 'BTC', 'BTC', 'BNB']
+for i in range(4):
+	print(f'\nTrade path between {base[i]} and {quote[i]}')
+	displayTradePaths(base[i], quote[i])
 
-	asset_file =  open('asset_info.csv') 
-	# Reading the csv
-	asset_data = csv.reader(asset_file)
-	# reading the file and converting to json
-	tradeFile = open(args['report'][1])
-	exchangeFile = open(args['report'][0])
-	trade_data = json.load(tradeFile)
-	exchange_data = json.load(exchangeFile)
-	loadAssetData()
-	loadTradeData()
-	print("\nAsset Overview")
-	assets.getAssetOverview()
-	print("\nTrade Overview")
-	graph.getTradeOverview()
-	
-# Showing the usage information
-else:
-	ap.print_help(sys.stderr)
-	sys.exit(1)
+# Asset overview
+print('\nAsset Overview')
+assets.getAssetOverview()
 
+# Trade overview
+print('\nTrade Overview')
+graph.getTradeOverview()
+
+# Ignoring a few assets 
+for asset in ['BTC', 'USDT']:
+	assetFilter(asset, 2)
+
+# Find asset details
+print('\nChecking if asset exist and printing its details')
+for label in ['BTC', 'BNB', 'USDT', 'PAX']:
+	displayAssetDetails(label)
+
+# Find Trade details
+print('\nChecking if trade exists and prints its details')
+for label in ['BTCUSDT', 'BNBBTC', 'ETHBTC']:
+	displayTradeDetails(label)
+
+# Displayiing trade paths
+base = ['BTC', 'BNB', 'BCC', 'ETH']
+quote = ['USDT', 'BTC', 'BTC', 'BNB']
+for i in range(4):
+	print(f'\nTrade path between {base[i]} and {quote[i]}')
+	displayTradePaths(base[i], quote[i])
+
+# Asset overview
+print('\nAsset Overview')
+assets.getAssetOverview()
+
+# Trade overview
+print('\nTrade Overview')
+graph.getTradeOverview()
+
+# Adding back those assets which were removed
+for asset in ['BTC', 'USDT']:
+	assetFilter(asset, 1)
+
+# Find asset details
+print('\nChecking if asset exist and printing its details')
+for label in ['BTC', 'BNB', 'USDT', 'PAX']:
+	displayAssetDetails(label)
+
+# Find Trade details
+print('\nChecking if trade exists and prints its details')
+for label in ['BTCUSDT', 'BNBBTC', 'ETHBTC']:
+	displayTradeDetails(label)
+
+# Displayiing trade paths
+base = ['BTC', 'BNB', 'BCC', 'ETH']
+quote = ['USDT', 'BTC', 'BTC', 'BNB']
+for i in range(4):
+	print(f'\nTrade path between {base[i]} and {quote[i]}')
+	displayTradePaths(base[i], quote[i])
+
+# Asset overview
+print('\nAsset Overview')
+assets.getAssetOverview()
+
+# Trade overview
+print('\nTrade Overview')
+graph.getTradeOverview()
+
+# Writing to a serialized file
+writeToSerializedFile()
+
+# reading from a serailiezed file 
+readFromSerializedFile()
