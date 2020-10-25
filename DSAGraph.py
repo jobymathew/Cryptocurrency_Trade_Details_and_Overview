@@ -1,12 +1,13 @@
-# FILE: DSAGraph.py - Modified for the assignment
-# AUTHOR: Joby Mathew
-# UNIT: COMP5008 Data Structures and Algorithms
-# PURPOSE: Provides a class for Graph Implementation which is to be used as cryptoGraph
-# REFERENCE: Lecture Slides
-# Last Mod: 18th September, 2020
+"""
+FILE: DSAGraph.py - Modified for the assignment
+AUTHOR: Joby Mathew
+UNIT: COMP5008 Data Structures and Algorithms
+PURPOSE: Provides a class for Graph Implementation which is to be used as cryptoGraph
+REFERENCE: Lecture Slides
+Last Mod: 23rd October, 2020
+"""
 
 from LinkedList import DSALinkedList
-from StackQueue import DSAStack, DSAQueue
 import numpy as np
 # importing sys to increase the recursion limit
 import sys
@@ -17,7 +18,12 @@ import copy
 
 class DSAGraphEdge():
 	
-	# initializing the constructor
+	"""
+	* Default Constructor.
+    * IMPORT: fromVertex (DSAGraphNode), toVertex (DSAGraphNode), status (String).
+    * EXPORT: none.
+    * USAGE: Initializing the values.
+	"""
 	def __init__(self, fromVertex, toVertex, status):
 		self.fromVertex = fromVertex
 		self.toVertex = toVertex
@@ -32,151 +38,321 @@ class DSAGraphEdge():
 		self.priceChange = 0
 		self.priceChangePercent = 0
 	
-	# Function to return the value of from vertex
+	"""
+	* METHOD: getFromVertex.
+    * IMPORT: none.
+    * EXPORT: fromVertex (DSAGraphNode).
+    * ASSERTION: none.
+	"""
 	def getFromVertex(self):
 		return self.fromVertex
 	
-	# Function to return the value of to vertex
+	"""
+	* METHOD: getToVertex.
+    * IMPORT: none.
+    * EXPORT: toVertex (DSAGraphNode).
+    * ASSERTION: none.
+	"""
 	def getToVertex(self):
 		return self.toVertex
 	
-	# Function to return the label of the edge
+	"""
+	* METHOD: getEdgeLabel.
+    * IMPORT: none.
+    * EXPORT: label (String).
+    * ASSERTION: none.
+	"""
 	def getEdgeLabel(self):
 		return self.fromVertex.getLabel()+self.toVertex.getLabel()
 	
-	# Function to return the status of the trade
+	"""
+	* METHOD: getStatus.
+    * IMPORT: none.
+    * EXPORT: status (String).
+    * ASSERTION: none.
+	"""
 	def getStatus(self):
 		return self.status
 	
-	# Function to set the volume of the trade
+	"""
+	* METHOD: setVolume.
+    * IMPORT: inVolume (float).
+    * EXPORT: none.
+    * ASSERTION: none.
+	"""
 	def setVolume(self, inVolume):
 		self.volume = inVolume
 	
-	# Function to set the count of the trade
+	"""
+	* METHOD: setCount.
+    * IMPORT: inCount (float).
+    * EXPORT: none.
+    * ASSERTION: none.
+	"""
 	def setCount(self, inCount):
 		self.count = inCount
 	
-	# Function to set the weightedAvgPrice of the trade
+	"""
+	* METHOD: setWeightedAvgPrice.
+    * IMPORT: inWeightedAvgPrice (float).
+    * EXPORT: none.
+    * ASSERTION: none.
+	"""
 	def setWeightedAvgPrice(self, inWeightedAvgPrice):
 		self.weightedAvgPrice = inWeightedAvgPrice
 
-	# Function to return the volume of the trade
+	"""
+	* METHOD: getVolume.
+    * IMPORT: none.
+    * EXPORT: volume (float).
+    * ASSERTION: none.
+	"""
 	def getVolume(self):
 		return self.volume
 	
-	# Function to return the count of the trade
+	"""
+	* METHOD: getCount.
+    * IMPORT: none.
+    * EXPORT: count (float).
+    * ASSERTION: none.
+	"""
 	def getCount(self):
 		return self.count
 	
-	# Function to return the weightedAvgPrice of the trade
+	"""
+	* METHOD: getWeightedAvgPrice.
+    * IMPORT: none.
+    * EXPORT: weightedAvgPrice (float).
+    * ASSERTION: none.
+	"""
 	def getWeightedAvgPrice(self):
 		return self.weightedAvgPrice
 	
-	# Function to set the quote volume of the trade
+	"""
+	* METHOD: setQuoteVolume.
+    * IMPORT: inQuoteVolume (float).
+    * EXPORT: none.
+    * ASSERTION: none.
+	"""
 	def setQuoteVolume(self, inQuoteVolume):
 		self.quoteVolume = inQuoteVolume
 	
-	# Function to return the quote volume of the trade
+	"""
+	* METHOD: getQuoteVolume.
+    * IMPORT: none.
+    * EXPORT: quoteVolume (float).
+    * ASSERTION: none.
+	"""
 	def getQuoteVolume(self):
 		return self.quoteVolume
 	
-	# Function to set the open price of the trade
+	"""
+	* METHOD: setOpenPrice.
+    * IMPORT: inOpenPrice (float).
+    * EXPORT: none.
+    * ASSERTION: none.
+	"""
 	def setOpenPrice(self, inOpenPrice):
 		self.openPrice = inOpenPrice
 	
-	# Function to return the open price of the trade
+	"""
+	* METHOD: getOpenPrice.
+    * IMPORT: none.
+    * EXPORT: openPrice (float).
+    * ASSERTION: none.
+	"""
 	def getOpenPrice(self):
 		return self.openPrice
 	
-	# Function to set the high price of the trade
+	"""
+	* METHOD: setHighPrice.
+    * IMPORT: inHighPrice (float).
+    * EXPORT: none.
+    * ASSERTION: none.
+	"""
 	def setHighPrice(self, inHighPrice):
 		self.highPrice = inHighPrice
 	
-	# Function to return the high price of the trade
+	"""
+	* METHOD: getHighPrice.
+    * IMPORT: none.
+    * EXPORT: highPrice (float).
+    * ASSERTION: none.
+	"""
 	def getHighPrice(self):
 		return self.highPrice
 	
-	# Function to set the low price of the trade
+	"""
+	* METHOD: setLowPrice.
+    * IMPORT: inLowPrice (float).
+    * EXPORT: none.
+    * ASSERTION: none.
+	"""
 	def setLowPrice(self, inLowPrice):
 		self.lowPrice = inLowPrice
 	
-	# Function to return the low price of the trade
+	"""
+	* METHOD: getLowPrice.
+    * IMPORT: none.
+    * EXPORT: lowPrice (float).
+    * ASSERTION: none.
+	"""
 	def getLowPrice(self):
 		return self.lowPrice
 	
-	# Function to set the price change of the trade
+	"""
+	* METHOD: setPriceChange.
+    * IMPORT: inPriceChange (float).
+    * EXPORT: none.
+    * ASSERTION: none.
+	"""
 	def setPriceChange(self, inPriceChange):
 		self.priceChange = inPriceChange
 	
-	# Function to return the price change of the trade
+	"""
+	* METHOD: getPriceChange.
+    * IMPORT: none.
+    * EXPORT: priceChange (float).
+    * ASSERTION: none.
+	"""
 	def getPriceChange(self):
 		return self.priceChange
 	
-	# Function to set the price change percent of the trade
+	"""
+	* METHOD: setPriceChangePercent.
+    * IMPORT: inPriceChangePercent.
+    * EXPORT: none.
+    * ASSERTION: none.
+	"""
 	def setPriceChangePercent(self, inPriceChangePercent):
 		self.priceChangePercent = inPriceChangePercent
 	
-	# Function to return the low price of the trade
+	"""
+	* METHOD: getPriceChangePercent.
+    * IMPORT: none.
+    * EXPORT: priceChangePercent (float).
+    * ASSERTION: none.
+	"""
 	def getPriceChangePercent(self):
 		return self.priceChangePercent
 
 
 class DSAGraphNode():
 
-	# initializing the graph
+	"""
+	* DEFAULT Constructor.
+    * IMPORT: inLabel (String), inValue (int).
+    * EXPORT: none.
+    * ASSERTION: Initalizing all the values.
+	"""
 	def __init__(self, inLabel, inValue):
 		self.label = inLabel
 		self.value = inValue
 		self.adjacents = DSALinkedList()
 		self.visited = False
 	
-	# Returning the list of adjacents
+	"""
+	* METHOD: getAdjacents.
+    * IMPORT: none.
+    * EXPORT: adjacents (DSALinkedList).
+    * USAGE: Return the list of adjacent vertices.
+	"""
 	def getAdjacents(self):
 		return self.adjacents
 
-	# Returning the label of the graph node
+	"""
+	* METHOD: getLabel.
+    * IMPORT: none.
+    * EXPORT: label (String).
+    * ASSERTION: none.
+	"""
 	def getLabel(self):
 		return self.label
 	
-	# Returning the value of the graph node
+	"""
+	* METHOD: getValue.
+    * IMPORT: none.
+    * EXPORT: value (int).
+    * ASSERTION: none.
+	"""
 	def getValue(self):
 		return self.value
 	
-	# Retuning the adjacent vertex list
+	"""
+	* METHOD: getAdjacent.
+    * IMPORT: none.
+    * EXPORT: AdjacentList[] (String).
+    * USAGE: Returns the list of labels.
+	"""
 	def getAdjacent(self):
 		return self.adjacents.listOfValues()
 	
-	# Checking if the given vertex is adjacent
+	"""
+	* METHOD: hasAdjacent.
+    * IMPORT: vertex (String).
+    * EXPORT: True/False (Boolean).
+    * USAGE: Checking if the given vertex is adjacent.
+	"""
 	def hasAdjacent(self, vertex):
 		return self.adjacents.hasNode(vertex)
 	
-	# Adding an edge to the graph node
+	"""
+	* METHOD: addAdjacent.
+    * IMPORT: vertex (String).
+    * EXPORT: none.
+    * USAGE: Adding an edge to the graph node.
+	"""
 	def addAdjacent(self, vertex):
 		if vertex != self.getLabel():
 			self.adjacents.insertLast(vertex)
 	
-	# Setting the graph node as visited
+	"""
+	* METHOD: setVisited.
+    * IMPORT: none.
+    * EXPORT: none.
+    * USAGE: Setting the vertex as visited.
+	"""
 	def setVisited(self):
 		self.visited = True
 	
-	# Clearing the graph node as visited
+	"""
+	* METHOD: clearVisited.
+    * IMPORT: none.
+    * EXPORT: none.
+    * USAGE: Clearing the vertex visit.
+	"""
 	def clearVisited(self):
 		self.visited = False
 	
-	# Checking if the graph node is visited or not
+	"""
+	* METHOD: getVisited.
+    * IMPORT: none.
+    * EXPORT: none.
+    * USAGE: Checking if the node is visited or not.
+	"""
 	def getVisited(self):
 		return self.visited
 
 
 class DSAGraph():
 
-	# Initializing the graph
+	"""
+	* DEFAULT Constructor.
+    * IMPORT: none.
+    * EXPORT: none.
+    * USAGE: Initializing the graph.
+	"""
 	def __init__(self):
 		self.vertices = DSALinkedList()
 		self.edges = DSALinkedList()
 		self.filterAssets = DSALinkedList()
 	
-	# Finding a vertex in the graph
+	"""
+	* METHOD: findVertex.
+    * IMPORT: value (String).
+    * EXPORT: none.
+    * USAGE: Finding a vertex in the graph.
+	"""
 	def findVertex(self, value):
 		vertex = None
 		# Finding the vertex if it is present in the list of filtered assets
@@ -189,7 +365,12 @@ class DSAGraph():
 					currVertex = currVertex.getNext()
 		return vertex
 	
-	# Finding an edge in the graph
+	"""
+	* METHOD: findEdge.
+    * IMPORT: fromValue (String), toValue (String).
+    * EXPORT: none.
+    * USAGE: Finding an edge in the graph.
+	"""
 	def findEdge(self, fromValue, toValue):
 		edge = None
 		# Finding the edge if it is present in the list of filterd assets
@@ -202,13 +383,23 @@ class DSAGraph():
 					currEdge = currEdge.getNext()
 		return edge
 
-	# Adding a vertex into the graph
+	"""
+	* METHOD: addVertex.
+    * IMPORT: label (String), value (int).
+    * EXPORT: none.
+    * USAGE: Adding a vertex into the graph.
+	"""
 	def addVertex(self, label, value):
 		vertex = DSAGraphNode(label, value)
 		self.vertices.insertLast(vertex)
 		self.filterAssets.insertLast(label)
 
-	# Adding an edge into the graph
+	"""
+	* METHOD: addEdge.
+    * IMPORT: label1 (String), label2 (String), status (String).
+    * EXPORT: none.
+    * USAGE: Adding an edge into the graph.
+	"""
 	def addEdge(self, label1, label2, status):
 		vertex1 = self.findVertex(label1)
 		vertex2 = self.findVertex(label2)
@@ -216,7 +407,12 @@ class DSAGraph():
 		edge = DSAGraphEdge(vertex1, vertex2, status)
 		self.edges.insertLast(edge)
 
-	# Searching for a vertex in the graph
+	"""
+	* METHOD: hasVertex.
+    * IMPORT: label (String).
+    * EXPORT: isPresent (Boolean).
+    * USAGE: Checking if a vertex is present in the graph.
+	"""
 	def hasVertex(self, label):
 		k = self.findVertex(label)
 		isPresent = True
@@ -224,7 +420,12 @@ class DSAGraph():
 			isPresent = False
 		return isPresent
 	
-	# Searching for an edge in the graph
+	"""
+	* METHOD: hasEdge.
+    * IMPORT: label1 (String), label2 (String).
+    * EXPORT: isPresent (Boolean).
+    * USAGE: Checking if an edge is present in the graph.
+	"""
 	def hasEdge(self, label1, label2):
 		isPresent = True
 		vertex1 = self.findVertex(label1)
@@ -234,20 +435,40 @@ class DSAGraph():
 			isPresent = False
 		return isPresent
 	
-	# Finding the vertex count
+	"""
+	* METHOD: getVertexCount.
+    * IMPORT: none.
+    * EXPORT: count (int).
+    * USAGE: Returns the number of vertices in the graph.
+	"""
 	def getVertexCount(self):
 		return self.vertices.count()
 	
-	# Finding the edge count
+	"""
+	* METHOD: getEdgeCount.
+    * IMPORT: none.
+    * EXPORT: count (int).
+    * USAGE: Returns the number of edges in the graph.
+	"""
 	def getEdgeCount(self):
 		return self.edges.count()
 	
-	# Returning a vertex in the graph
+	"""
+	* METHOD: getVertex.
+    * IMPORT: label (String).
+    * EXPORT: vertex (DSAGraphNode).
+    * USAGE: Find and return the vertex in the graph.
+	"""
 	def getVertex(self, label):
 		vertex = self.findVertex(label)
 		return vertex
 	
-	# Returning an edge in the graph
+	"""
+	* METHOD: getVertex.
+    * IMPORT: label1 (String), label2 (String).
+    * EXPORT: edge (DSAGraphEdge).
+    * USAGE: Find and return the edge in the graph.
+	"""
 	def getEdge(self, label1, label2):
 		edge = None
 		vertex1 = self.findVertex(label1)
@@ -256,14 +477,24 @@ class DSAGraph():
 			edge = self.findEdge(vertex1, vertex2)
 		return edge
 	
-	# Function to check if there is a trade edge in the graph
+	"""
+	* METHOD: hasTradeEdge.
+    * IMPORT: tradeName (String).
+    * EXPORT: isFound (Boolean).
+    * USAGE: Check if the trade edge exists in the graph.
+	"""
 	def hasTradeEdge(self, tradeName):
 		isFound = False
 		if self.getTradeEdge(tradeName):
 			isFound = True
 		return isFound
 	
-	# Function to find the edge connecting the two assets
+	"""
+	* METHOD: getTradeEdge.
+    * IMPORT: tradeName (String).
+    * EXPORT: edge (DSAGraphEdge).
+    * USAGE: Get the trade edge from the graph.
+	"""
 	def getTradeEdge(self, tradeName):
 		edge = None
 		isFound = False
@@ -276,21 +507,30 @@ class DSAGraph():
 						edge = self.getEdge(label1, label2)
 		return edge
 	
-	# Function to remove a vertex from a graph
-	def removeVertex(self, inVertex):
-		vertex = self.getVertex(inVertex)
-		self.vertices.delete(vertex)
-		# unfinished
-	
-	# ignore the given asset
+	"""
+	* METHOD: ignoreAsset.
+    * IMPORT: inAsset (String).
+    * EXPORT: none.
+    * USAGE: ignore the given asset.
+	"""
 	def ignoreAsset(self, inAsset):
 		self.filterAssets.remove(inAsset);
 	
-	# re-add the given asset
+	"""
+	* METHOD: addAsset.
+    * IMPORT: inAsset (String).
+    * EXPORT: none.
+    * USAGE: Re-add the given asset.
+	"""
 	def addAsset(self, inAsset):
 		self.filterAssets.insertLast(inAsset);
 	
-	# Function to check if the trade edge is tradeable
+	"""
+	* METHOD: isTrading.
+    * IMPORT: tradeName (String).
+    * EXPORT: trading (Boolean).
+    * USAGE: Check if the edge is tradable.
+	"""
 	def isTrading(self, tradeName):
 		trading = False
 		edge = self.getTradeEdge(tradeName)
@@ -298,7 +538,12 @@ class DSAGraph():
 			trading = True
 		return trading
 	
-	# Function to find the exchange between the given assets - Note that this is a modified DFS 
+	"""
+	* METHOD: _getDetails.
+    * IMPORT: labels (String[]), exchangeArray (Object[]), pathExchange (float), quoteAsset (String).
+    * EXPORT: exchangeArray (Object[]).
+    * USAGE: find the exchange between the given assets. This is a modified DFS.
+	"""
 	def _getDetails(self, labels, exchangeArray, pathExchange, quoteAsset):
 		# Getting the last value from the labels list
 		label = labels.peekLast()
@@ -345,7 +590,12 @@ class DSAGraph():
 							exchangeArray = self._getDetails(newLabels, exchangeArray, newPathExchange, quoteAsset)
 		return exchangeArray
 	
-	# Function to get the overall between two assets
+	"""
+	* METHOD: getTradeDetails.
+    * IMPORT: baseAsset (String), quoteAsset (String).
+    * EXPORT: resultArray (Object[]).
+    * USAGE: Get the overall exchange between the two assets and their trade paths.
+	"""
 	def getTradeDetails(self, baseAsset, quoteAsset):
 		self.clearAllVisited()
 		# Declaring an empty array
@@ -381,49 +631,65 @@ class DSAGraph():
 		# returning the results
 		return resultArray
 	
-	# Clearing all the visited vertices
+	"""
+	* METHOD: clearAllVisited.
+    * IMPORT: none.
+    * EXPORT: none.
+    * USAGE: Clearing all the visited vertices.
+	"""
 	def clearAllVisited(self):
 		vertices = self.filterAssets.listOfValues()
 		for label in vertices:
 			vertex = self.getVertex(label)
 			vertex.clearVisited()
 
-	# Retruning the list of adjacent vertices of the vertex - returns the label
+	"""
+	* METHOD: getAdjacent.
+    * IMPORT: label (String).
+    * EXPORT: none.
+    * USAGE: Retruning the list of adjacent vertices of the vertex - returns the labels.
+	"""
 	def getAdjacent(self, label):
-		adjacentVertex = []
+		adjacentVertex = np.array([])
 		vertex = self.findVertex(label)
 		if vertex:
 			adjacentVertex = vertex.getAdjacent()
 		return adjacentVertex
 	
-	# Retruning the list of adjacent vertices of the vertex - returns the label
+	"""
+	* METHOD: displayAdjacent.
+    * IMPORT: label (String).
+    * EXPORT: none.
+    * USAGE: Print the list of adjacent vertices of the vertex - prints the labels.
+	"""
 	def displayAdjacent(self, label):
 		adjacentVertex = self.getAdjacent(label)
 		print(adjacentVertex)
 		
 
-	# Retruning the list of adjacent vertices of the vertex - return the edge class
+	"""
+	* METHOD: getAdjacentE.
+    * IMPORT: labels (String).
+    * EXPORT: none.
+    * USAGE: Return the list of adjacent edges of the vertex.
+	"""
 	def getAdjacentE(self, label1):
-		adjacentEdges = []
+		adjacentEdges = DSALinkedList()
 		vertex1 = self.findVertex(label1)
 		if vertex1:
 			adjacentVertices =  vertex1.getAdjacent()
 			if adjacentVertices:
 				for label2 in adjacentVertices:
 					if self.hasEdge(label1, label2):
-						# print(vertex2.getLabel())
-						val = self.getEdge(label1, label2)
-						adjacentEdges.append(val)
-		return adjacentEdges
+						adjacentEdges.insertLast(label1+label2)
+		return adjacentEdges.listOfValues()
 	
-	def displayAdjacentE(self, label):
-		edges = self.getAdjacentE(label)
-		displayList = []
-		for edge in edges:
-			displayList.append(f'{edge.getFromVertex().getLabel()}{edge.getToVertex().getLabel()}')
-		print(displayList)
-	
-	# Checking if a vertex is adjacent to the other
+	"""
+	* METHOD: isAdjacent.
+    * IMPORT: label1 (String), label2 (String).
+    * EXPORT: isAnEdge (Boolean).
+    * USAGE: Checking if a vertex is adjacent to the other.
+	"""
 	def isAdjacent(self, label1, label2):
 		isAnEdge = False
 		vertex1 = self.findVertex(label1)
@@ -432,19 +698,32 @@ class DSAGraph():
 			isAnEdge = True
 		return isAnEdge
 	
-	# Displaying the graph
+	"""
+	* METHOD: display.
+    * IMPORT: none.
+    * EXPORT: none.
+    * USAGE: Displaying the graph.
+	"""
 	def display(self):
 		if not self.vertices.isEmpty():
 			print('Vertices of the graph')
-			ll = self.listOfVertices()
-			print(ll)
-			
+			verticesList = self.listOfVertices()
+			for val in verticesList:
+				print(val.getLabel(), end=" ")
+			print()
+
 		if not self.edges.isEmpty():
 			print('Edges of the graph')
 			edgesList = self.listOfEdgeValues()
-			print(edgesList)
-	
-	# List of vertex labels in the graph
+			for val in edgesList:
+				print(val, end=" ")
+			print()	
+	"""
+	* METHOD: listOfVerticeLabels.
+    * IMPORT: none.
+    * EXPORT: rtnList[] (String).
+    * USAGE: List of vertex labels in the graph.
+	"""
 	def listOfVerticeLabels(self):
 		vertexList = self.vertices.listOfValues()
 		rtnList = np.empty(self.vertices.count(), dtype=object)
@@ -453,19 +732,39 @@ class DSAGraph():
 				rtnList[i] = val.getLabel()
 		return rtnList
 	
-	# List of vertices in the graph
+	"""
+	* METHOD: listOfVertices.
+    * IMPORT: none.
+    * EXPORT: verticesList[] (DSAGraphNode).
+    * USAGE: List of vertices in the graph.
+	"""
 	def listOfVertices(self):
 		return self.vertices.listOfValues()
 	
-	# List of filtered assets in the graph
+	"""
+	* METHOD: listOfFilterAssets.
+    * IMPORT: none.
+    * EXPORT: filterAssetsList[] (String).
+    * USAGE: List of filtered assets in the graph.
+	"""
 	def listOfFilterAssets(self):
 		return self.filterAssets.listOfValues()
 	
-	# List of filtered assets in the graph
+	"""
+	* METHOD: listOfEdges.
+    * IMPORT: none.
+    * EXPORT: filterAssetsList[] (DSAGraphEdge).
+    * USAGE: List of edges in the graph.
+	"""
 	def listOfEdges(self):
 		return self.edges.listOfValues()
 	
-	# List of edge values in the graph
+	"""
+	* METHOD: listOfEdgeValues.
+    * IMPORT: none.
+    * EXPORT: rtnList[] (String).
+    * USAGE: List of edges Values in the graph.
+	"""
 	def listOfEdgeValues(self):
 		edgeList = self.edges.listOfValues()
 		rtnList = np.empty(self.edges.count(), dtype=object)
@@ -475,18 +774,32 @@ class DSAGraph():
 				rtnList[i] = output
 		return rtnList
 	
-	# Getting the first vertex of the graph
+	"""
+	* METHOD: getFirstVertex.
+    * IMPORT: none.
+    * EXPORT: firstVertex (DSAGraphNode).
+	"""
 	def getFirstVertex(self):
 		return self.vertices.peekFirst()
 
-	# Shifting down values in the given array 
-	def shiftDown(self, position, highValues, highLabels):
+	"""
+	* METHOD: _shiftDown.
+    * IMPORT: position (int), highValues[] (float), highLabels[] (String).
+    * EXPORT: none.
+	* USAGE: Shifting down values in the given array
+	"""
+	def _shiftDown(self, position, highValues, highLabels):
 		for i in range(position+1, highValues.size):
 			highValues[position], highValues[i] = highValues[i], highValues[position]
 			highLabels[position], highLabels[i] = highLabels[i], highLabels[position]
 	
-	# Inserting the value into the array
-	def insertHighValue(self, inLabel, inValue, highValues, highLabels):
+	"""
+	* METHOD: _insertHighValue.
+    * IMPORT: inLabel (String), inValue (float) ,highValues[] (float), highLabels[] (String).
+    * EXPORT: none.
+	* USAGE: Inserting the value into the array
+	"""
+	def _insertHighValue(self, inLabel, inValue, highValues, highLabels):
 		isInserted, i = False, 0
 		while (not isInserted) and (i<highValues.size):
 			if highValues[i] == None:
@@ -494,19 +807,29 @@ class DSAGraph():
 				highLabels[i] = inLabel
 				isInserted = True
 			elif float(inValue) > highValues[i]:
-				self.shiftDown(i, highValues, highLabels)
+				self._shiftDown(i, highValues, highLabels)
 				highValues[i] = float(inValue)
 				highLabels[i] = inLabel
 				isInserted = True
 			i += 1
 	
-	# Displaying the trade overview details
+	"""
+	* METHOD: displayOverview.
+    * IMPORT: labels[] (String), values[] (float).
+    * EXPORT: none.
+	* USAGE: Displaying the trade overview details
+	"""
 	def displayOverview(self, labels, values):
 		for i in range(labels.size):
 			print(f'{i+1}. {labels[i]} - {values[i]}')
 		print()
 					
-	# Finding the Trade overview details
+	"""
+	* METHOD: getTradeOverview.
+    * IMPORT: none.
+    * EXPORT: none.
+	* USAGE: Finding the trade overview details
+	"""
 	def getTradeOverview(self):
 		# Getting the list of edges
 		edgeList = self.listOfEdges()
@@ -535,15 +858,15 @@ class DSAGraph():
 			toVertex = edge.getToVertex().getLabel()
 			# Inserting the highest values if it is not ignored
 			if self.filterAssets.hasNode(fromVertex) and self.filterAssets.hasNode(toVertex):
-				self.insertHighValue(label, edge.priceChange, highestPriceChange, highestPriceChangeLabels)
-				self.insertHighValue(label, edge.priceChangePercent, highestPriceChangePercent, highestPriceChangePercentLabels)
-				self.insertHighValue(label, edge.weightedAvgPrice, highestWeightedAvgPrice, highestWeightedAvgPriceLabels)
-				self.insertHighValue(label, edge.openPrice, highestOpenPrice, highestOpenPriceLabels)
-				self.insertHighValue(label, edge.highPrice, highestHighPrice, highestHighPriceLabels)
-				self.insertHighValue(label, edge.lowPrice, highestLowPrice, highestLowPriceLabels)
-				self.insertHighValue(label, edge.volume, highestVolume, highestVolumeLabels)
-				self.insertHighValue(label, edge.quoteVolume, highestQuoteVolume, highestQuoteVolumeLabels)
-				self.insertHighValue(label, edge.count, highestCount, highestCountLabels)
+				self._insertHighValue(label, edge.priceChange, highestPriceChange, highestPriceChangeLabels)
+				self._insertHighValue(label, edge.priceChangePercent, highestPriceChangePercent, highestPriceChangePercentLabels)
+				self._insertHighValue(label, edge.weightedAvgPrice, highestWeightedAvgPrice, highestWeightedAvgPriceLabels)
+				self._insertHighValue(label, edge.openPrice, highestOpenPrice, highestOpenPriceLabels)
+				self._insertHighValue(label, edge.highPrice, highestHighPrice, highestHighPriceLabels)
+				self._insertHighValue(label, edge.lowPrice, highestLowPrice, highestLowPriceLabels)
+				self._insertHighValue(label, edge.volume, highestVolume, highestVolumeLabels)
+				self._insertHighValue(label, edge.quoteVolume, highestQuoteVolume, highestQuoteVolumeLabels)
+				self._insertHighValue(label, edge.count, highestCount, highestCountLabels)
 		# Printing out the top 10 values
 		print('\nTop 10 Price Change')
 		self.displayOverview(highestPriceChangeLabels, highestPriceChange)

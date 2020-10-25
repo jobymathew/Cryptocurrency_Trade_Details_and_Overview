@@ -1,3 +1,12 @@
+"""
+FILE: cryptoGraph.py 
+AUTHOR: Joby Mathew
+UNIT: COMP5008 Data Structures and Algorithms
+PURPOSE: Handle the crypto data and provide the results 
+REFERENCE: Lecture Slides
+Last Mod: 25th October, 2020
+"""
+
 # sys and argparse to implement argument parsing
 import sys
 import argparse

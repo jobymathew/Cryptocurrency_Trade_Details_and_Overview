@@ -1,4 +1,13 @@
 
+"""
+FILE: UnitTestAsset.py 
+AUTHOR: Joby Mathew
+UNIT: COMP5008 Data Structures and Algorithms
+PURPOSE: Provides a Test Harness for Asset 
+REFERENCE: Lecture Slides
+Last Mod: 23rd October, 2020
+"""
+
 from Asset import AssetObject
 import numpy as np
 import csv

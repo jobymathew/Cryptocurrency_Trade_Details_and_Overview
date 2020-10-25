@@ -1,3 +1,12 @@
+"""
+FILE: UnitTestCryptoGraph.py 
+AUTHOR: Joby Mathew
+UNIT: COMP5008 Data Structures and Algorithms
+PURPOSE: Provides a Test Harness for Crypto Graph 
+REFERENCE: Lecture Slides
+Last Mod: 25th October, 2020
+"""
+
 import numpy as np
 # Minh Dao - Tutor Sophie Lee-Goh
 # Using the Graph class which I made during the practicals
